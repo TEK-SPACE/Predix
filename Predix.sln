@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predix.Domain.Model", "Predix.Domain.Model\Predix.Domain.Model.csproj", "{7F72E9E0-463C-40C8-9B08-3596D91A432E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.UI", "Predic.Pipeline.UI\Predic.Pipeline.UI.csproj", "{9DB112B2-C435-43C2-9ADF-BD531236457C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.Interface", "Predic.Pipeline.Interface\Predic.Pipeline.Interface.csproj", "{F7631CDB-A84D-498C-87CE-30F414717AE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.Service", "Predic.Pipeline.Service\Predic.Pipeline.Service.csproj", "{83B637AC-D192-4FE4-8CE9-1A6B85D0C06C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.Test", "Predic.Pipeline.Test\Predic.Pipeline.Test.csproj", "{1BEC4EB3-4D42-4A34-890E-2A376D89C631}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.DataService", "Predic.Pipeline.DataService\Predic.Pipeline.DataService.csproj", "{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F72E9E0-463C-40C8-9B08-3596D91A432E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F72E9E0-463C-40C8-9B08-3596D91A432E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F72E9E0-463C-40C8-9B08-3596D91A432E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F72E9E0-463C-40C8-9B08-3596D91A432E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DB112B2-C435-43C2-9ADF-BD531236457C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DB112B2-C435-43C2-9ADF-BD531236457C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DB112B2-C435-43C2-9ADF-BD531236457C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DB112B2-C435-43C2-9ADF-BD531236457C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7631CDB-A84D-498C-87CE-30F414717AE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7631CDB-A84D-498C-87CE-30F414717AE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7631CDB-A84D-498C-87CE-30F414717AE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7631CDB-A84D-498C-87CE-30F414717AE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83B637AC-D192-4FE4-8CE9-1A6B85D0C06C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83B637AC-D192-4FE4-8CE9-1A6B85D0C06C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83B637AC-D192-4FE4-8CE9-1A6B85D0C06C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83B637AC-D192-4FE4-8CE9-1A6B85D0C06C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BEC4EB3-4D42-4A34-890E-2A376D89C631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BEC4EB3-4D42-4A34-890E-2A376D89C631}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BEC4EB3-4D42-4A34-890E-2A376D89C631}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BEC4EB3-4D42-4A34-890E-2A376D89C631}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
