@@ -45,5 +45,9 @@ namespace Predix.Domain.Model.Location
         [JsonIgnore]
         [ForeignKey("LocationUid")]
         public Details LocationDetails { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey("ImageAssetUid")]
+        public Image Image { get; set; }
     }
 }

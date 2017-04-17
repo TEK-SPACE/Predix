@@ -47,5 +47,9 @@ namespace Predix.Domain.Model.Location
         [JsonIgnore]
         [ForeignKey("ActivityId")]
         public Activity Activity { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey("Uid")]
+        public Details LocationDetails { get; set; }
     }
 }
