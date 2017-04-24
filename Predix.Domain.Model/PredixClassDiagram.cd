@@ -42,5 +42,12 @@
       <FileName>CommonEntity.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="Predix.Domain.Model.Activity">
+    <Position X="6" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAAAAAAAQAAAAAAAAAAAAAAAAQAAQAAAAQAAAA=</HashCode>
+      <FileName>Activity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

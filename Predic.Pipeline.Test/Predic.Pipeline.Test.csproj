@@ -35,7 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.6.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.6.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -43,15 +48,30 @@
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="LocationTest.cs" />
+    <Compile Include="SecurityTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Predic.Pipeline.Interface\Predic.Pipeline.Interface.csproj">
+      <Project>{f7631cdb-a84d-498c-87ce-30f414717ae5}</Project>
+      <Name>Predic.Pipeline.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Predic.Pipeline.Service\Predic.Pipeline.Service.csproj">
+      <Project>{83b637ac-d192-4fe4-8ce9-1a6b85d0c06c}</Project>
+      <Name>Predic.Pipeline.Service</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Predix.Domain.Model\Predix.Domain.Model.csproj">
+      <Project>{7f72e9e0-463c-40c8-9b08-3596d91a432e}</Project>
+      <Name>Predix.Domain.Model</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

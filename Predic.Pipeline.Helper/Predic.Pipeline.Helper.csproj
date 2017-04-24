@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9DB112B2-C435-43C2-9ADF-BD531236457C}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{E4EA6006-FE75-4D07-A1D5-BF0CFCD46D3B}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Predic.Pipeline.UI</RootNamespace>
-    <AssemblyName>Predic.Pipeline.UI</AssemblyName>
+    <RootNamespace>Predic.Pipeline.Helper</RootNamespace>
+    <AssemblyName>Predic.Pipeline.Helper</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -43,25 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="LoggingHandler .cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Predic.Pipeline.Interface\Predic.Pipeline.Interface.csproj">
-      <Project>{F7631CDB-A84D-498C-87CE-30F414717AE5}</Project>
-      <Name>Predic.Pipeline.Interface</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Predic.Pipeline.Service\Predic.Pipeline.Service.csproj">
-      <Project>{83B637AC-D192-4FE4-8CE9-1A6B85D0C06C}</Project>
-      <Name>Predic.Pipeline.Service</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Predix.Domain.Model\Predix.Domain.Model.csproj">
-      <Project>{7f72e9e0-463c-40c8-9b08-3596d91a432e}</Project>
-      <Name>Predix.Domain.Model</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

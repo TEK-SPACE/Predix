@@ -43,6 +43,8 @@
     <Compile Include="IBatch.cs" />
     <Compile Include="IImage.cs" />
     <Compile Include="ILocation.cs" />
+    <Compile Include="IPredixHttpClient.cs" />
+    <Compile Include="ISecurity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
