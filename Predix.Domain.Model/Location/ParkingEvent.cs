@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Predix.Domain.Model.Location
 {
-    [Table("LocationDetails", Schema ="dbo")]
-    public class Details : CommonEntity
+    [Table("ParkingActivity", Schema ="dbo")]
+    public sealed class ParkingEvent : CommonEntity
     {
         /// <summary>
         /// <para>A unique identifier established by a customer or external resource for a specific location within the monitored area. For example, LOCATION-STG-323.</para>
@@ -39,10 +39,10 @@ namespace Predix.Domain.Model.Location
         public int ActivityId { get; set; }
         [JsonIgnore]
         [ForeignKey("ActivityId")]
-        public virtual Activity Activity { get; set; }
+        public Activity Activity { get; set; }
 
         [JsonIgnore]
         [ForeignKey("Uid")]
-        public Identifier Identifier { get; set; }
+        public Location Identifier { get; set; }
     }
 }

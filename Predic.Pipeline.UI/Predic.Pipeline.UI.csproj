@@ -50,6 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Predic.Pipeline.Helper\Predic.Pipeline.Helper.csproj">
+      <Project>{e4ea6006-fe75-4d07-a1d5-bf0cfcd46d3b}</Project>
+      <Name>Predic.Pipeline.Helper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Predic.Pipeline.Interface\Predic.Pipeline.Interface.csproj">
       <Project>{F7631CDB-A84D-498C-87CE-30F414717AE5}</Project>
       <Name>Predic.Pipeline.Interface</Name>

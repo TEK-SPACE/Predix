@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Predix.Domain.Model.Location;
 
@@ -13,16 +14,24 @@ namespace Predic.Pipeline.Interface
         /// <param name="locationType">enumeration codes for locationType <example>PARKING_SPOT consists of demarcated parking spaces within the defined boundaries (Not applicable in v2).</example><example>PARKING_ZONE consists of four geo-coordinates ( see coordinateType: GEO) indicating non-demarcated parking spaces within the defined boundaries.</example></param>
         /// <param name="size">Maximum number of records to return per page; if none specified, the default is used automatically.</param>
         /// <returns></returns>
-        List<Identifier> All(string bbox, string locationType, int size);
+        List<Location> All(string bbox, string locationType, int size);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="locationUid">The identifier assigned to this location<example>LOCATION-282</example></param>
         /// <param name="eventType">Filter for pedestrian events<example>["PKIN,PKOUT"]</example></param>
         /// <returns></returns>
-        Task<Details> Get(string locationUid, string eventType);
-
-        void SaveLocationKeys(List<Identifier> locationKeys);
-        void SaveLocationDetails(List<Details> locationDetails);
+        ParkingEvent Get(string locationUid, string eventType);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="locationUid"></param>
+        /// <param name="eventType"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        List<ParkingEvent> Get(string locationUid, string eventType, DateTime startDate, DateTime endTime);
+        void SaveLocationKeys(List<Location> locationKeys);
+        void SaveLocationDetails(List<ParkingEvent> locationDetails);
     }
 }

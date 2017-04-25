@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Predix.Domain.Model.Location
 {
     [Table("Locations", Schema = "dbo")]
-    public sealed class Identifier : CommonEntity
+    public sealed class Location : CommonEntity
     {
         /// <summary>
         /// <para>A unique identifier established by a customer or external resource for a specific location within the monitored area. For example, LOCATION-STG-323.</para>
@@ -50,6 +50,6 @@ namespace Predix.Domain.Model.Location
 
         [JsonIgnore]
         [ForeignKey("Uid")]
-        public Details LocationDetails { get; set; }
+        public ParkingEvent LocationDetails { get; set; }
     }
 }

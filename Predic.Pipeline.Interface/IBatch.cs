@@ -11,6 +11,6 @@ namespace Predic.Pipeline.Interface
     public interface IBatch : ILocation
     {
         Activity PullAndSaveAllLocations();
-        Activity PullAndSaveLocationDetails(List<Identifier> identifiers);
+        Activity PullAndSaveLocationDetails(List<Location> identifiers);
     }
 }

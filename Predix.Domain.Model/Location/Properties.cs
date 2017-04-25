@@ -44,7 +44,7 @@ namespace Predix.Domain.Model.Location
 
         [JsonIgnore]
         [ForeignKey("LocationUid")]
-        public Details LocationDetails { get; set; }
+        public ParkingEvent LocationDetails { get; set; }
 
         [JsonIgnore]
         [ForeignKey("ImageAssetUid")]

@@ -14,7 +14,7 @@ namespace Predic.Pipeline.Service
         private readonly ISecurity _securityService = new SecurityService();
         public async Task<string> GetAllAsync(string url, Dictionary<string,string> additionalHeaders)
         {
-            await _securityService.SetClientToken();
+            _securityService.SetClientToken().Wait();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
                                                    SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             using (HttpClient httpClient = new HttpClient(new LoggingHandler(new HttpClientHandler())))
