@@ -9,7 +9,7 @@ namespace Predic.Pipeline.Test
 {
     class EventTest
     {
-        private IEvents _eventService;
+        private IEvent _eventService;
 
         [SetUp]
         public void Init()
@@ -17,7 +17,7 @@ namespace Predic.Pipeline.Test
             _eventService = new EventService();
         }
         [Test]
-        [TestCase("LOCATION-STG-189", "PKIN,PKOUT")]
+        [TestCase("LOCATION-225", "PKIN")]
         public void GetWebSocketTest(string locationUid, string eventType)
         {
             var details = _eventService.Get(locationUid, eventType);
@@ -26,7 +26,7 @@ namespace Predic.Pipeline.Test
         }
 
         [Test]
-        [TestCase("LOCATION-STG-189", "PKIN")]
+        [TestCase("LOCATION-225", "PKIN")]
         public void GetTest(string locationUid, string eventType)
         {
             DateTime startDate = new DateTime(2015, 10, 28, 18, 58, 57, DateTimeKind.Utc);

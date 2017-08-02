@@ -52,6 +52,7 @@
     <Compile Include="Enum\ActivityType.cs" />
     <Compile Include="Location\Image.cs" />
     <Compile Include="Location\Location.cs" />
+    <Compile Include="Location\Media.cs" />
     <Compile Include="Location\ParkingEvent.cs" />
     <Compile Include="Location\Properties.cs" />
     <Compile Include="Location\Measures.cs" />

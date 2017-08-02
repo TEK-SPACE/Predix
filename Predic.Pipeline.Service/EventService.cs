@@ -9,7 +9,7 @@ using Predix.Domain.Model.Location;
 
 namespace Predic.Pipeline.Service
 {
-    public class EventService : IEvents
+    public class EventService : IEvent
     {
         private readonly IPredixHttpClient _predixHttpClient = new PredixHttpClient();
         private readonly IPredixWebSocketClient _predixWebSocketClient = new PredixWebSocketClient();
@@ -38,14 +38,15 @@ namespace Predic.Pipeline.Service
             ParkingEvent details = null;
             Dictionary<string, string> additionalHeaders =
                 new Dictionary<string, string> { { "predix-zone-id", "SDSIM-IE-PARKING" } };
-            //string bodyMessage = $"{{\"locationUid\":\"{locationUid}\",\"eventTypes\":[\"{eventType}\"]}}";
-            string bodyMessage = $"{{\"bbox\":\"32.715675:-117.161230,32.708498:-117.151681\",\"eventTypes\":[\"PKIN\"]}}";
-            var response = _predixWebSocketClient.GetAllAsync(Endpoint.WebSocketUrl, bodyMessage, additionalHeaders);
+            string bodyMessage = $"{{\"locationUid\":\"{locationUid}\",\"eventTypes\":[\"{eventType}\"]}}";
+            //string bodyMessage = $"{{\"bbox\":\"32.715675:-117.161230,32.708498:-117.151681\",\"eventTypes\":[\"PKIN\"]}}";
+            var response = _predixWebSocketClient.GetAllAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders);
             if (!string.IsNullOrWhiteSpace(response.Result))
             {
                 var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
-                details = jsonRespone["content"] != null
-                    ? ((JArray)jsonRespone["content"]).ToObject<ParkingEvent>()
+                details = jsonRespone != null
+                    //? ((JArray)jsonRespone["content"]).ToObject<ParkingEvent>()
+                    ? (jsonRespone).ToObject<ParkingEvent>()
                     : new ParkingEvent();
             }
             return details;

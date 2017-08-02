@@ -4,7 +4,7 @@ using Predix.Domain.Model.Location;
 
 namespace Predic.Pipeline.Interface
 {
-    public interface  IEvents
+    public interface  IEvent
     {
         /// <summary>
         /// 

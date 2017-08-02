@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Predic.Pipeline.Helper;
 using Predic.Pipeline.Interface;
 using Predix.Domain.Model.Constant;
 using Predix.Domain.Model.Location;
 
 namespace Predic.Pipeline.Service
 {
-    public class LocationService : ILocation, IImage
+    public class LocationService : ILocation
     {
         private readonly IPredixHttpClient _predixHttpClient = new PredixHttpClient();
 
@@ -19,7 +18,8 @@ namespace Predic.Pipeline.Service
             int pageNumber = 0;
             int totalPages = 1;
             Dictionary<string, string> additionalHeaders =
-                new Dictionary<string, string> {{"Predix-Zone-Id", "ics-IE-PARKING"}};
+                 //new Dictionary<string, string> {{"Predix-Zone-Id", "ics-IE-PARKING"}};
+                new Dictionary<string, string> { { "predix-zone-id", "SDSIM-IE-PARKING" } };
             while (totalPages - 1 >= pageNumber)
             {
                 var response = _predixHttpClient.GetAllAsync(Endpoint.GetListOfLocation
@@ -48,16 +48,6 @@ namespace Predic.Pipeline.Service
         }
 
         public void SaveLocationDetails(List<ParkingEvent> locationDetails)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Image MediaOnDemand(string imageAssetUid)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SaveImage(Image image)
         {
             throw new NotImplementedException();
         }

@@ -6,7 +6,7 @@ namespace Predix.Domain.Model.Constant
 {
     public static class Endpoint
     {
-        private const string MetaDataUrl = "https://ie-cities-metadata.run.asv-pr-pub.ice.predix.io/v2";
+        private const string MetaDataUrl = "https://ic-metadata-service.run.aws-usw02-pr.ice.predix.io/v2/metadata";
 
         private const string BaseUrl =
             "https://890407d7-e617-4d70-985f-01792d693387.predix-uaa.run.aws-usw02-pr.ice.predix.io";
@@ -28,12 +28,13 @@ namespace Predix.Domain.Model.Constant
             }
         }
 
-        public const string WebSocketUrl = "wss://ic-websocket-server.run.aws-usw02-pr.ice.predix.io/events";
+        public const string WebSocketUrlForEvents = "wss://ic-websocket-server.run.aws-usw02-pr.ice.predix.io/events";
         public static string ClientAccessToken { get; set; }
 
         public static readonly string GetListOfLocation =
-                $"{MetaDataUrl}/locations/search?q=locationType:{{locationType}}&bbox={{bbox}}&page={{pageNumber}}&size={{pageSize}}"
-            ;
+                $"{MetaDataUrl}/locations/search?q=locationType:{{locationType}}&bbox={{bbox}}&page={{pageNumber}}&size={{pageSize}}";
+
+        public const string MediaUrl = "https://ic-media-service.run.aws-usw02-pr.ice.predix.io/v2/mediastore";
 
         /// <summary>
         /// wss://{{production url}}/events
@@ -41,13 +42,7 @@ namespace Predix.Domain.Model.Constant
         /// <example>{“locationUid":"LOCATION-282","eventTypes":["PKIN,PKOUT"]}</example></para>
         /// </summary>
         public const string NearRealTimeDataByLocationUid = "wss://<production url>/events";
-        /// <summary>
-        /// <para>"headers": "Authorization: Bearer {{client_token}}\nPredix-Zone-Id: {{ps_zone_id}}\n"</para>
-        /// <para>"method": "GET"</para>
-        /// <para>"data": []</para>
-        /// <para>"version": 2</para>
-        /// </summary>
-        public const string MediaOnDemand =
-                "{{mediaurl}}/ondemand/assets/{{ps_asset}}/media?mediaType=IMAGE&timestamp=1480503600000&page=0&size=100&sortBy=mediaLogId&sortDir=DESC";
+
+        public static readonly string MediaOnDemand = $"{MediaUrl}/ondemand/assets/{{ps_asset}}/media?mediaType=IMAGE&timestamp={{timestamp}}&page=0&size=100&sortBy=mediaLogId&sortDir=DESC";
     }
 }

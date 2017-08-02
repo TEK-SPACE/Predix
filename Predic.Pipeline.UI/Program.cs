@@ -10,6 +10,8 @@ namespace Predic.Pipeline.UI
     static class Program
     {
         private static ILocation _locationService;
+        private static IEvent _eventService;
+        private static IImage _imageService;
 
         static void Main(string[] args)
         {
@@ -38,16 +40,17 @@ namespace Predic.Pipeline.UI
                     Commentary.Print($"Start Date : {startDate:G}", true);
                     Commentary.Print($"End Date : {endDate:G}", true);
 
-                    var parkingEvents = _locationService.Get(location.Uid, eventType, startDate, endDate);
-                    parkingEventsForAllLocations.AddRange(parkingEvents);
-                    Commentary.Print($"Total {eventType} events for Location UID: {location.Uid} are {parkingEvents.Count}");
+                    var parkingEvent = _eventService.Get(location.Uid, eventType);
+                    parkingEventsForAllLocations.Add(parkingEvent);
+                    Commentary.Print($"Event Type: {eventType}, Location UID: {location.Uid} Asset UID:{parkingEvent.AssetUid}");
+                    var imageAsset = _imageService.MediaOnDemand(parkingEvent.AssetUid, parkingEvent.Timestamp);
                 }
             }
             Commentary.Print($"Total Events for all locations: {parkingEventsForAllLocations.Count}");
-            foreach (var parkingEvent in parkingEventsForAllLocations)
-            {
-                Commentary.Print($"Not Implemented: Pull Image Media for each parking event: {parkingEvent.AssetUid}");
-            }
+            //foreach (var parkingEvent in parkingEventsForAllLocations)
+            //{
+            //    var imageAsset = _imageService.MediaOnDemand(parkingEvent.AssetUid, parkingEvent.Timestamp);
+            //}
             Commentary.Print($"Completed. Please enter a key to exit");
         }
 
@@ -55,6 +58,8 @@ namespace Predic.Pipeline.UI
         {
             Commentary.WriteToFile = true;
             _locationService = new LocationService();
+            _eventService = new EventService();
+            _imageService = new ImageService();
         }
     }
 }

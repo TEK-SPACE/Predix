@@ -9,7 +9,7 @@ namespace Predic.Pipeline.Interface
         /// </summary>
         /// <param name="imageAssetUid"></param>
         /// <returns></returns>
-        Image MediaOnDemand(string imageAssetUid);
+        Image MediaOnDemand(string imageAssetUid, string timestamp);
         /// <summary>
         /// 
         /// </summary>

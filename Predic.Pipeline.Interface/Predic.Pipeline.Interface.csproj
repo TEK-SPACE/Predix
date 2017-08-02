@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IBatch.cs" />
-    <Compile Include="IEvents.cs" />
+    <Compile Include="IEvent.cs" />
     <Compile Include="IImage.cs" />
     <Compile Include="ILocation.cs" />
     <Compile Include="IPredixHttpClient.cs" />
