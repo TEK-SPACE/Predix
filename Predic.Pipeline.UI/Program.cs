@@ -43,7 +43,7 @@ namespace Predic.Pipeline.UI
                     var parkingEvent = _eventService.Get(location.Uid, eventType);
                     parkingEventsForAllLocations.Add(parkingEvent);
                     Commentary.Print($"Event Type: {eventType}, Location UID: {location.Uid} Asset UID:{parkingEvent.AssetUid}");
-                    var imageAsset = _imageService.MediaOnDemand(parkingEvent.AssetUid, parkingEvent.Timestamp);
+                    var imageBase64 = _imageService.MediaOnDemand(parkingEvent.AssetUid, parkingEvent.Timestamp);
                 }
             }
             Commentary.Print($"Total Events for all locations: {parkingEventsForAllLocations.Count}");

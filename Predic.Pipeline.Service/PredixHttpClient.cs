@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -31,6 +33,44 @@ namespace Predic.Pipeline.Service
                     {
                         var result = await httpContent.ReadAsStringAsync();
                         return result;
+                    }
+                }
+            }
+        }
+        public async Task<string> GetFile(string url, Dictionary<string, string> additionalHeaders)
+        {
+            _securityService.SetClientToken().Wait();
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
+                                                   SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            using (HttpClient httpClient = new HttpClient(new LoggingHandler(new HttpClientHandler())))
+            {
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", Endpoint.ClientAccessToken);
+                foreach (var additionalHeader in additionalHeaders)
+                {
+                    httpClient.DefaultRequestHeaders.Add(additionalHeader.Key, additionalHeader.Value);
+                }
+                //using (MemoryStream memoryStream = new MemoryStream())
+                //{
+                //    using (HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK))
+                //    {
+                //        result.Content = new ByteArrayContent(memoryStream.ToArray());
+                //        result.Content.Headers.ContentType =
+                //            new MediaTypeHeaderValue($"image/jpg");
+                //        var imageUrl = $"data:image/jpg;base64," +
+                //                       Convert.ToBase64String(memoryStream.ToArray(), 0, memoryStream.ToArray().Length);
+                //        return imageUrl;
+                //    }
+                //}
+
+                using (HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(url))
+                {
+                    using (HttpContent httpContent = httpResponseMessage.Content)
+                    {
+                        var result = await httpContent.ReadAsByteArrayAsync();
+                        var imageUrl = $"data:image/jpg;base64," +
+                                       Convert.ToBase64String(result);
+                        return imageUrl;
                     }
                 }
             }

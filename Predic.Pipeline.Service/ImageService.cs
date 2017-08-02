@@ -14,14 +14,15 @@ namespace Predic.Pipeline.Service
     public class ImageService : IImage
     {
         private readonly IPredixHttpClient _predixHttpClient = new PredixHttpClient();
-        public Image MediaOnDemand(string imageAssetUid, string timestamp)
+
+        public string MediaOnDemand(string imageAssetUid, string timestamp)
         {
             Image image = new Image();
             var media = GetMedia(imageAssetUid, timestamp);
             if (!string.IsNullOrWhiteSpace(media?.PollUrl))
             {
                 Dictionary<string, string> additionalHeaders =
-                    new Dictionary<string, string> { { "predix-zone-id", "SDSIM-IE-PUBLIC-SAFETY" } };
+                    new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PUBLIC-SAFETY"}};
                 var response = _predixHttpClient.GetAllAsync(media.PollUrl, additionalHeaders);
                 if (!string.IsNullOrWhiteSpace(response.Result))
                 {
@@ -36,18 +37,12 @@ namespace Predic.Pipeline.Service
                 foreach (var content in image.Entry.Contents)
                 {
                     Dictionary<string, string> additionalHeaders =
-                        new Dictionary<string, string> { { "predix-zone-id", "SDSIM-IE-PUBLIC-SAFETY" } };
-                    var response = _predixHttpClient.GetAllAsync(content.Url, additionalHeaders);
-                    if (!string.IsNullOrWhiteSpace(response.Result))
-                    {
-                        var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
-                        image = jsonRespone != null
-                            ? (jsonRespone).ToObject<Image>()
-                            : new Image();
-                    }
+                        new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PUBLIC-SAFETY"}};
+                    var response = _predixHttpClient.GetFile(content.Url, additionalHeaders);
+                    return response.Result;
                 }
             }
-            return image;
+            return null;
         }
 
         private Media GetMedia(string imageAssetUid, string timestamp)
