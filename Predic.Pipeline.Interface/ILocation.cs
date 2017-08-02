@@ -15,22 +15,7 @@ namespace Predic.Pipeline.Interface
         /// <param name="size">Maximum number of records to return per page; if none specified, the default is used automatically.</param>
         /// <returns></returns>
         List<Location> All(string bbox, string locationType, int size);
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="locationUid">The identifier assigned to this location<example>LOCATION-282</example></param>
-        /// <param name="eventType">Filter for pedestrian events<example>["PKIN,PKOUT"]</example></param>
-        /// <returns></returns>
-        ParkingEvent Get(string locationUid, string eventType);
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="locationUid"></param>
-        /// <param name="eventType"></param>
-        /// <param name="startDate"></param>
-        /// <param name="endTime"></param>
-        /// <returns></returns>
-        List<ParkingEvent> Get(string locationUid, string eventType, DateTime startDate, DateTime endTime);
+       
         void SaveLocationKeys(List<Location> locationKeys);
         void SaveLocationDetails(List<ParkingEvent> locationDetails);
     }

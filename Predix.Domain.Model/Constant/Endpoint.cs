@@ -4,12 +4,12 @@ using System.Text;
 
 namespace Predix.Domain.Model.Constant
 {
-    public class Endpoint
+    public static class Endpoint
     {
         private const string MetaDataUrl = "https://ie-cities-metadata.run.asv-pr-pub.ice.predix.io/v2";
 
         private const string BaseUrl =
-            "https://8553482c-1d32-4d38-8597-2e56ab642dd3.predix-uaa.run.asv-pr.ice.predix.io";
+            "https://890407d7-e617-4d70-985f-01792d693387.predix-uaa.run.aws-usw02-pr.ice.predix.io";
         public static readonly string AccessTokenUri = $"{BaseUrl}/oauth/token?grant_type=client_credentials";
 
         private const string Eventurl = "https://ie-cities-events.run.asv-pr-pub.ice.predix.io/v2";
@@ -28,8 +28,7 @@ namespace Predix.Domain.Model.Constant
             }
         }
 
-        public const string WebSocketUrl = //"wss://ic-websocket-server.run.aws-usw02-pr.ice.predix.io/events";
-            "wss://ie-cities-websocket.run.asv-pr-pub.ice.predix.io/events";
+        public const string WebSocketUrl = "wss://ic-websocket-server.run.aws-usw02-pr.ice.predix.io/events";
         public static string ClientAccessToken { get; set; }
 
         public static readonly string GetListOfLocation =

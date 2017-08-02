@@ -28,8 +28,8 @@ namespace Predic.Pipeline.UI
             foreach (var location in locations)
             {
                 Commentary.Print($"Get Parking Events for");
-                DateTime startDate = new DateTime(2015, 10, 28, 18, 58, 57, DateTimeKind.Utc);
-                DateTime endDate = new DateTime(2017, 10, 28, 19, 12, 17, DateTimeKind.Utc);
+                DateTime startDate = new DateTime(2017, 04, 28, 18, 58, 57, DateTimeKind.Utc);
+                DateTime endDate = new DateTime(2017, 04, 28, 19, 12, 17, DateTimeKind.Utc);
                 var eventTypes = new[] {"PKIN", "PKOUT"};
                 foreach (var eventType in eventTypes)
                 {

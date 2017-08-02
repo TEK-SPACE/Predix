@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventService.cs" />
     <Compile Include="LocationService.cs" />
     <Compile Include="PredixHttpClient.cs" />
     <Compile Include="PredixWebSocketClient.cs" />

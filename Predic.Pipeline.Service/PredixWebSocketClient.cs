@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Predic.Pipeline.Helper;
 using Predic.Pipeline.Interface;
 using Predix.Domain.Model.Constant;
 
@@ -26,10 +28,7 @@ namespace Predic.Pipeline.Service
             using (ClientWebSocket clientWebSocket = new ClientWebSocket())
             {
                 Uri serverUri = new Uri(url);
-                //new Uri("wss://echo.websocket.org");
-                //clientWebSocket.Options.SetRequestHeader("Authorization", $"Basic {Endpoint.OAuthToken}");
-                //clientWebSocket.Options.Credentials = new NetworkCredential();
-                clientWebSocket.Options.SetRequestHeader("Authorization", $"Basic {Endpoint.ClientAccessToken}");
+                clientWebSocket.Options.SetRequestHeader("Authorization", $"Bearer {Endpoint.ClientAccessToken}");
                 foreach (var additionalHeader in additionalHeaders)
                 {
                     clientWebSocket.Options.SetRequestHeader(additionalHeader.Key, additionalHeader.Value);
