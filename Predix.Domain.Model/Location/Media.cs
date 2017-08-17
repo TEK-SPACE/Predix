@@ -1,9 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace Predix.Domain.Model.Location
 {
    public  class Media
    {
+       [JsonIgnore]
+       [Key]
+       public int Id { get; set; }
         [JsonProperty("pollUrl")]
         public string PollUrl { get; set; }
         [JsonProperty("noOfElements")]

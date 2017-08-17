@@ -2,11 +2,15 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Predic.Pipeline.DataService;
+using Predix.Domain.Model;
+using Predix.Domain.Model.Enum;
 
 namespace Predic.Pipeline.Helper
 {
     public class LoggingHandler : DelegatingHandler
     {
+        public int ActivityId { get; set; }
         public LoggingHandler(HttpMessageHandler innerHandler)
             : base(innerHandler)
         {
@@ -32,6 +36,21 @@ namespace Predic.Pipeline.Helper
             }
             //Console.WriteLine();
 
+            using (PredixContext context = new PredixContext())
+            {
+                var activity = new Activity
+                {
+                    ProcessDateTime = DateTime.Now,
+                    RequestJson = request.Content?.ReadAsStringAsync().Result,
+                    ResponseJson = response.Content?.ReadAsStringAsync().Result,
+                    Type = request.Method.Method.Equals("get", StringComparison.OrdinalIgnoreCase)
+                        ? ActivityType.Get
+                        : ActivityType.Post
+                };
+                context.Activities.Add(activity);
+                context.SaveChanges();
+                ActivityId = activity.Id;
+            }
             return response;
         }
     }

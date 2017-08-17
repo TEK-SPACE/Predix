@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Predic.Pipeline.DataService;
 using Predic.Pipeline.Helper;
 using Predic.Pipeline.Interface;
 using Predix.Domain.Model.Constant;
@@ -11,7 +13,13 @@ namespace Predic.Pipeline.Service
 {
     public class EventService : IEvent
     {
-        private readonly IPredixHttpClient _predixHttpClient = new PredixHttpClient();
+        private readonly IPredixHttpClient _predixHttpClient;
+        private static Dictionary<string, object> _globalVariables;
+        public EventService(Dictionary<string, object> globalVariables)
+        {
+            _predixHttpClient = new PredixHttpClient(globalVariables);
+            _globalVariables = globalVariables;
+        }
         private readonly IPredixWebSocketClient _predixWebSocketClient = new PredixWebSocketClient();
         public List<ParkingEvent> Get(string locationUid, string eventType, DateTime startDate, DateTime endTime)
         {
@@ -49,7 +57,19 @@ namespace Predic.Pipeline.Service
                     ? (jsonRespone).ToObject<ParkingEvent>()
                     : new ParkingEvent();
             }
+            Save(details);
             return details;
+        }
+
+        private void Save(ParkingEvent parkingEvent)
+        {
+            if (parkingEvent == null)
+                return;
+            using (PredixContext context = new PredixContext())
+            {
+                context.Details.Add(parkingEvent);
+                context.SaveChanges();
+            }
         }
     }
 }

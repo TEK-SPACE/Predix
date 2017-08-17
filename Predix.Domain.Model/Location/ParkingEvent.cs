@@ -1,11 +1,15 @@
-﻿using Newtonsoft.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Predix.Domain.Model.Location
 {
     [Table("ParkingActivity", Schema ="dbo")]
-    public sealed class ParkingEvent : CommonEntity
+    public class ParkingEvent : CommonEntity
     {
+        [JsonIgnore]
+        [Key]
+        public int Id { get; set; }
         /// <summary>
         /// <para>A unique identifier established by a customer or external resource for a specific location within the monitored area. For example, LOCATION-STG-323.</para>
         /// </summary>
@@ -41,8 +45,8 @@ namespace Predix.Domain.Model.Location
         [ForeignKey("ActivityId")]
         public Activity Activity { get; set; }
 
-        [JsonIgnore]
-        [ForeignKey("Uid")]
-        public Location Identifier { get; set; }
+        //[JsonIgnore]
+        //[ForeignKey("Uid")]
+        //public Location Identifier { get; set; }
     }
 }

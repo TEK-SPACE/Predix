@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Predic.Pipeline.DataService;
 using Predic.Pipeline.Interface;
 using Predix.Domain.Model.Constant;
 using Predix.Domain.Model.Location;
@@ -13,7 +14,13 @@ namespace Predic.Pipeline.Service
 {
     public class ImageService : IImage
     {
-        private readonly IPredixHttpClient _predixHttpClient = new PredixHttpClient();
+        private readonly IPredixHttpClient _predixHttpClient;
+        private static Dictionary<string, object> _globalVariables;
+        public ImageService(Dictionary<string, object> globalVariables)
+        {
+            _predixHttpClient = new PredixHttpClient(globalVariables);
+            _globalVariables = globalVariables;
+        }
 
         public string MediaOnDemand(string imageAssetUid, string timestamp)
         {
@@ -32,17 +39,16 @@ namespace Predic.Pipeline.Service
                         : new Image();
                 }
             }
-            if (image?.Entry != null && image.Entry.Contents.Any())
-            {
-                foreach (var content in image.Entry.Contents)
-                {
-                    Dictionary<string, string> additionalHeaders =
-                        new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PUBLIC-SAFETY"}};
-                    var response = _predixHttpClient.GetFile(content.Url, additionalHeaders);
-                    return response.Result;
-                }
-            }
-            return null;
+            if (image?.Entry == null || !image.Entry.Contents.Any()) return null;
+            var imageBinary =  (from content in image.Entry.Contents
+                let additionalHeaders = new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PUBLIC-SAFETY"}}
+                select _predixHttpClient.GetFile(content.Url, additionalHeaders)
+                into response
+                select response.Result).FirstOrDefault();
+            image.Base64 = imageBinary;
+
+            Save(image);
+            return imageBinary;
         }
 
         private Media GetMedia(string imageAssetUid, string timestamp)
@@ -53,19 +59,35 @@ namespace Predic.Pipeline.Service
             var response = _predixHttpClient.GetAllAsync(Endpoint.MediaOnDemand
                 .Replace("{ps_asset}", imageAssetUid)
                 .Replace("{timestamp}", timestamp), additionalHeaders);
-            if (!string.IsNullOrWhiteSpace(response.Result))
-            {
-                var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
-                media = jsonRespone != null
-                    ? (jsonRespone).ToObject<Media>()
-                    : new Media();
-            }
+            if (string.IsNullOrWhiteSpace(response.Result)) return null;
+            var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
+            media = jsonRespone != null
+                ? (jsonRespone).ToObject<Media>()
+                : new Media();
+            Save(media);
             return media;
         }
 
-        public void SaveImage(Image image)
+        private void Save(Media media)
         {
-            throw new NotImplementedException();
+            if (media == null)
+                return;
+            using (PredixContext context = new PredixContext())
+            {
+                context.Medias.Add(media);
+                context.SaveChanges();
+            }
+        }
+
+        private void Save(Image image)
+        {
+            if (image == null)
+                return;
+            using (PredixContext context = new PredixContext())
+            {
+                context.Images.Add(image);
+                context.SaveChanges();
+            }
         }
     }
 }

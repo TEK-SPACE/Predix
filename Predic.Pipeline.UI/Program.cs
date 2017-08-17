@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 using Predic.Pipeline.Helper;
 using Predic.Pipeline.Interface;
 using Predic.Pipeline.Service;
 using Predix.Domain.Model.Location;
+using Predic.Pipeline.DataService;
 
 namespace Predic.Pipeline.UI
 {
@@ -12,7 +15,7 @@ namespace Predic.Pipeline.UI
         private static ILocation _locationService;
         private static IEvent _eventService;
         private static IImage _imageService;
-
+        internal static Dictionary<string, object> _globalVariables = new Dictionary<string, object>();
         static void Main(string[] args)
         {
             Init();
@@ -56,10 +59,12 @@ namespace Predic.Pipeline.UI
 
         static void Init()
         {
+
             Commentary.WriteToFile = true;
-            _locationService = new LocationService();
-            _eventService = new EventService();
-            _imageService = new ImageService();
+            _locationService = new LocationService(_globalVariables);
+            _eventService = new EventService(_globalVariables);
+            _imageService = new ImageService(_globalVariables);
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<PredixContext, PredixContextInitializer>());
         }
     }
 }

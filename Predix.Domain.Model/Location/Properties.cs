@@ -1,11 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace Predix.Domain.Model.Location
 {
     [Table("LocationProperties", Schema = "dbo")]
-    public sealed class Properties : CommonEntity
+    public class Properties : CommonEntity
     {
+        [JsonIgnore]
+        [Key]
+        public int Id { get; set; }
         /// <summary>
         /// Local coordinates of the identified vehicle in the image. The coordinates of the four corners of the vehicle are provided.
         /// </summary>
@@ -42,12 +46,12 @@ namespace Predix.Domain.Model.Location
         [JsonIgnore]
         public int LocationUid { get; set; }
 
-        [JsonIgnore]
-        [ForeignKey("LocationUid")]
-        public ParkingEvent LocationDetails { get; set; }
+        //[JsonIgnore]
+        //[ForeignKey("LocationUid")]
+        //public ParkingEvent LocationDetails { get; set; }
 
-        [JsonIgnore]
-        [ForeignKey("ImageAssetUid")]
-        public Image Image { get; set; }
+        //[JsonIgnore]
+        //[ForeignKey("ImageAssetUid")]
+        //public Image Image { get; set; }
     }
 }

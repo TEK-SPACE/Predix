@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace Predix.Domain.Model.Location
@@ -6,6 +7,9 @@ namespace Predix.Domain.Model.Location
     [Table("Images", Schema = "dbo")]
     public class Image : CommonEntity
     {
+        [JsonIgnore]
+        [Key]
+        public int Id { get; set; }
         [JsonProperty("last")]
         public bool Last { get; set; }
         [JsonProperty("totalPages")]
@@ -21,13 +25,15 @@ namespace Predix.Domain.Model.Location
         [JsonProperty("number")]
         public int Number { get; set; }
         public string Status { get; set; }
-        [JsonProperty("listOfEntries")]
+        [JsonProperty("listOfEntries")] [NotMapped]
         public Entries Entry { get; set; }
         [JsonIgnore]
         public int ActivityId { get; set; }
         [JsonIgnore]
         [ForeignKey("ActivityId")]
         public virtual Activity Activity { get; set; }
+        [JsonIgnore]
+        public string Base64 { get; set; }
     }
 
     public class Entries
@@ -35,8 +41,13 @@ namespace Predix.Domain.Model.Location
         [JsonProperty("content")]
         public Content[] Contents { get; set; }
     }
+
+    [Table("ImageContent", Schema = "dbo")]
     public class Content
     {
+        [JsonIgnore]
+        [Key]
+        public int Id { get; set; }
         [JsonProperty("mediaType")]
         public string MediaType { get; set; }
         [JsonProperty("mediaFileName")]

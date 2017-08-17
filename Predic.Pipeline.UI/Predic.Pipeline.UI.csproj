@@ -33,7 +33,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -48,8 +55,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Predic.Pipeline.DataService\Predic.Pipeline.DataService.csproj">
+      <Project>{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}</Project>
+      <Name>Predic.Pipeline.DataService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Predic.Pipeline.Helper\Predic.Pipeline.Helper.csproj">
       <Project>{e4ea6006-fe75-4d07-a1d5-bf0cfcd46d3b}</Project>
       <Name>Predic.Pipeline.Helper</Name>
