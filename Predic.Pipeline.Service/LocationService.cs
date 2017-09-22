@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Migrations;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,19 +15,21 @@ namespace Predic.Pipeline.Service
     {
         private readonly IPredixHttpClient _predixHttpClient;
         private static Dictionary<string, object> _globalVariables;
+
         public LocationService(Dictionary<string, object> globalVariables)
         {
             _predixHttpClient = new PredixHttpClient(globalVariables);
             _globalVariables = globalVariables;
         }
+
         public List<Location> All(string bbox, string locationType, int size)
         {
-            List<Location> identifiers = new List<Location>();
+            List<Location> locationList = new List<Location>();
             int pageNumber = 0;
             int totalPages = 1;
             Dictionary<string, string> additionalHeaders =
-                 //new Dictionary<string, string> {{"Predix-Zone-Id", "ics-IE-PARKING"}};
-                new Dictionary<string, string> { { "predix-zone-id", "SDSIM-IE-PARKING" } };
+                //new Dictionary<string, string> {{"Predix-Zone-Id", "ics-IE-PARKING"}};
+                new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PARKING"}};
             while (totalPages - 1 >= pageNumber)
             {
                 var response = _predixHttpClient.GetAllAsync(Endpoint.GetListOfLocation
@@ -40,13 +43,34 @@ namespace Predic.Pipeline.Service
                     ? ((JArray) jsonRespone["content"]).ToObject<List<Location>>()
                     : new List<Location>();
                 SaveLocationKeys(locations);
-                identifiers.AddRange(locations);
+                locationList.AddRange(locations);
                 totalPages = jsonRespone["totalPages"] != null ? (int) jsonRespone["totalPages"] : 0;
                 pageNumber++;
             }
-            return identifiers;
+            return locationList;
         }
 
+        public List<LocationDetails> Details(List<string> locationUids)
+        {
+            Dictionary<string, string> additionalHeaders =
+                new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PARKING"}};
+            List<LocationDetails> locationDetailsList = new List<LocationDetails>();
+            foreach (var locationUid in locationUids)
+            {
+                var response = _predixHttpClient.GetAllAsync(Endpoint.GetLocationDetails
+                    .Replace("{locationUid}", locationUid), additionalHeaders);
+                if (string.IsNullOrWhiteSpace(response.Result))
+                    return null;
+
+                var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
+                var locationDetails = (jsonRespone).ToObject<LocationDetails>();
+                locationDetailsList.Add(locationDetails);
+            }
+            if (locationDetailsList.Any())
+                SaveLocationDetails(locationDetailsList);
+
+            return locationDetailsList;
+        }
 
 
         public void SaveLocationKeys(List<Location> locationKeys)
@@ -56,14 +80,27 @@ namespace Predic.Pipeline.Service
             using (PredixContext context = new PredixContext())
             {
                 locationKeys.ForEach(x => x.ActivityId = Convert.ToInt32(_globalVariables["ActivityId"]));
-                context.Identifiers.AddRange(locationKeys);
+                foreach (var locationKey in locationKeys)
+                {
+                    context.Locations.AddOrUpdate(x => x.LocationUid, locationKey);
+                }
                 context.SaveChanges();
             }
         }
 
-        public void SaveLocationDetails(List<ParkingEvent> locationDetails)
+        public void SaveLocationDetails(List<LocationDetails> locationDetailsList)
         {
-            throw new NotImplementedException();
+            if (!locationDetailsList.Any())
+                return;
+            using (PredixContext context = new PredixContext())
+            {
+                //locationKeys.ForEach(x => x.ActivityId = Convert.ToInt32(_globalVariables["ActivityId"]));
+                foreach (var locationDetails in locationDetailsList)
+                {
+                    context.LocationDetails.AddOrUpdate(x => x.LocationUid, locationDetails);
+                }
+                context.SaveChanges();
+            }
         }
     }
 }

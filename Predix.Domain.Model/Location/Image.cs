@@ -8,8 +8,9 @@ namespace Predix.Domain.Model.Location
     public class Image : CommonEntity
     {
         [JsonIgnore]
-        [Key]
-        public int Id { get; set; }
+        [Key][StringLength(255)]
+        public string ImageAssetUid { get; set; }
+
         [JsonProperty("last")]
         public bool Last { get; set; }
         [JsonProperty("totalPages")]
@@ -28,7 +29,7 @@ namespace Predix.Domain.Model.Location
         [JsonProperty("listOfEntries")] [NotMapped]
         public Entries Entry { get; set; }
         [JsonIgnore]
-        public int ActivityId { get; set; }
+        public int? ActivityId { get; set; }
         [JsonIgnore]
         [ForeignKey("ActivityId")]
         public virtual Activity Activity { get; set; }
@@ -42,12 +43,9 @@ namespace Predix.Domain.Model.Location
         public Content[] Contents { get; set; }
     }
 
-    [Table("ImageContent", Schema = "dbo")]
+    [Table("ImageContents", Schema = "dbo")]
     public class Content
     {
-        [JsonIgnore]
-        [Key]
-        public int Id { get; set; }
         [JsonProperty("mediaType")]
         public string MediaType { get; set; }
         [JsonProperty("mediaFileName")]
@@ -55,6 +53,8 @@ namespace Predix.Domain.Model.Location
         [JsonProperty("mediaTimestamp")]
         public string MediaTimestap { get; set; }
         [JsonProperty("assetUid")]
+        [Key]
+        [StringLength(255)]
         public string AssetUid { get; set; }
         [JsonProperty("status")]
         public string Status { get; set; }

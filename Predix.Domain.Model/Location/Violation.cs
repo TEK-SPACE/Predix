@@ -9,6 +9,6 @@ namespace Predix.Domain.Model.Location
         public bool IsTimeLimitViolation  { get; set; }
         public bool IsNoParkingViolation { get; set; }
         public bool IsDistance { get; set; }
-        public virtual Properties Properties { get; set; }
+        public virtual ParkingEventProperties Properties { get; set; }
     }
 }

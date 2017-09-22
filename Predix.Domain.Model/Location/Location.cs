@@ -7,13 +7,15 @@ namespace Predix.Domain.Model.Location
     [Table("Locations", Schema = "dbo")]
     public class Location : CommonEntity
     {
-        [JsonIgnore][Key]
-        public int Id { get; set; }
+        //[JsonIgnore]
+        //public int Id { get; set; }
         /// <summary>
         /// <para>A unique identifier established by a customer or external resource for a specific location within the monitored area. For example, LOCATION-STG-323.</para>
         /// </summary>
         [JsonProperty(PropertyName = "locationUid")]
-        public string Uid { get; set; }
+        [Key]
+        [StringLength(250)]
+        public string LocationUid { get; set; }
         /// <summary>
         /// <para>CITIES: Insert the following enumeration codes for a specific location type for CITIES</para>
         /// <para>PARKING_SPOT: PARKING_SPOT consists of demarcated parking spaces within the defined boundaries(Not applicable in v2).</para>
@@ -46,11 +48,13 @@ namespace Predix.Domain.Model.Location
         [JsonProperty(PropertyName = "coordinates")]
         public string Coordinates { get; set; }
         [JsonIgnore]
-        public int ActivityId { get; set; }
+        public int? ActivityId { get; set; }
         [JsonIgnore]
         [ForeignKey("ActivityId")]
         public Activity Activity { get; set; }
 
+        //[ForeignKey("LocationUid")]
+        //public virtual LocationDetails LocationDetails { get; set; }
         //[JsonIgnore]
         //[ForeignKey("Uid")]
         //public ParkingEvent LocationDetails { get; set; }

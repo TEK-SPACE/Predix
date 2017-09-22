@@ -15,18 +15,20 @@ namespace Predic.Pipeline.UI
         private static ILocation _locationService;
         private static IEvent _eventService;
         private static IImage _imageService;
-        internal static Dictionary<string, object> _globalVariables = new Dictionary<string, object>();
+        private static readonly Dictionary<string, object> GlobalVariables = new Dictionary<string, object>();
         static void Main(string[] args)
         {
             Init();
             var bbox = "32.715675:-117.161230,32.708498:-117.151681";
             var locationType = "PARKING_ZONE";
-            int pagesize = 5;
+            int pagesize = 50;
             Commentary.Print($"Calling Get All Locations by BBOX & Location Type");
             Commentary.Print($"BBOX: {bbox}", true);
             Commentary.Print($"Location Type: {locationType}", true);
             var locations = _locationService.All(bbox, locationType, pagesize);
             Commentary.Print($"Total Locations: {locations.Count}");
+
+            _locationService.Details(locations.Select(x=>x.LocationUid).Distinct().ToList());
 
             var parkingEventsForAllLocations = new List<ParkingEvent>();
            
@@ -38,15 +40,15 @@ namespace Predic.Pipeline.UI
                 var eventTypes = new[] {"PKIN", "PKOUT"};
                 foreach (var eventType in eventTypes)
                 {
-                    Commentary.Print($"Location UID: {location.Uid}", true);
+                    Commentary.Print($"Location UID: {location.LocationUid}", true);
                     Commentary.Print($"Event Type : {eventType}", true);
                     Commentary.Print($"Start Date : {startDate:G}", true);
                     Commentary.Print($"End Date : {endDate:G}", true);
 
-                    var parkingEvent = _eventService.Get(location.Uid, eventType);
+                    var parkingEvent = _eventService.Get(location.LocationUid, eventType);
                     parkingEventsForAllLocations.Add(parkingEvent);
-                    Commentary.Print($"Event Type: {eventType}, Location UID: {location.Uid} Asset UID:{parkingEvent.AssetUid}");
-                    var imageBase64 = _imageService.MediaOnDemand(parkingEvent.AssetUid, parkingEvent.Timestamp);
+                    Commentary.Print($"Event Type: {eventType}, Location UID: {location.LocationUid} Asset UID:{parkingEvent.AssetUid}");
+                   _imageService.MediaOnDemand(parkingEvent.AssetUid, parkingEvent.Timestamp);
                 }
             }
             Commentary.Print($"Total Events for all locations: {parkingEventsForAllLocations.Count}");
@@ -61,9 +63,9 @@ namespace Predic.Pipeline.UI
         {
 
             Commentary.WriteToFile = true;
-            _locationService = new LocationService(_globalVariables);
-            _eventService = new EventService(_globalVariables);
-            _imageService = new ImageService(_globalVariables);
+            _locationService = new LocationService(GlobalVariables);
+            _eventService = new EventService(GlobalVariables);
+            _imageService = new ImageService(GlobalVariables);
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<PredixContext, PredixContextInitializer>());
         }
     }

@@ -11,7 +11,7 @@ namespace Predix.Domain.Model.Location
         [Key]
         public int Id { get; set; }
         [JsonIgnore]
-        public int ActivityId { get; set; }
+        public int? ActivityId { get; set; }
 
         [JsonIgnore]
         [ForeignKey("ActivityId")]

@@ -50,20 +50,29 @@
     <Compile Include="CommonEntity.cs" />
     <Compile Include="Constant\Endpoint.cs" />
     <Compile Include="Enum\ActivityType.cs" />
+    <Compile Include="GeViolation.cs" />
     <Compile Include="Location\Image.cs" />
+    <Compile Include="Location\LocalDetailAnalyticCategory.cs" />
     <Compile Include="Location\Location.cs" />
+    <Compile Include="Location\LocationDetailProperties.cs" />
+    <Compile Include="Location\LocationDetails.cs" />
     <Compile Include="Location\Media.cs" />
     <Compile Include="Location\ParkingEvent.cs" />
-    <Compile Include="Location\Properties.cs" />
+    <Compile Include="Location\ParkingEventProperties.cs" />
     <Compile Include="Location\Measures.cs" />
     <Compile Include="Location\Violation.cs" />
+    <Compile Include="NodeMaster.cs" />
+    <Compile Include="NodeMasterRegulation.cs" />
+    <Compile Include="ParkingRegulation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PredixClassDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Event\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

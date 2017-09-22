@@ -15,8 +15,14 @@ namespace Predic.Pipeline.Interface
         /// <param name="size">Maximum number of records to return per page; if none specified, the default is used automatically.</param>
         /// <returns></returns>
         List<Location> All(string bbox, string locationType, int size);
-       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="locationUids"></param>
+        /// <returns></returns>
+        List<LocationDetails> Details(List<string> locationUids);
+
         void SaveLocationKeys(List<Location> locationKeys);
-        void SaveLocationDetails(List<ParkingEvent> locationDetails);
+        void SaveLocationDetails(List<LocationDetails> locationDetailsList);
     }
 }

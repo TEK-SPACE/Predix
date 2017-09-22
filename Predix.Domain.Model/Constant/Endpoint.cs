@@ -13,6 +13,7 @@ namespace Predix.Domain.Model.Constant
         public static readonly string AccessTokenUri = $"{BaseUrl}/oauth/token?grant_type=client_credentials";
 
         private const string Eventurl = "https://ie-cities-events.run.asv-pr-pub.ice.predix.io/v2";
+            //"https://ic-event-service.run.aws-usw02-pr.ice.predix.io/v2/";
 
         public static readonly string PkInPkOutByLocationId =
                 $"{Eventurl}/locations/{{parking_loc}}/events?eventType={{parkInOrOut}}&startTime={{startTimeInEpoch}}&endTime={{endTimeInEpoch}}";
@@ -28,12 +29,16 @@ namespace Predix.Domain.Model.Constant
             }
         }
 
-        public const string WebSocketUrlForEvents = "wss://ic-websocket-server.run.aws-usw02-pr.ice.predix.io/events";
+        public const string WebSocketUrlForEvents =
+            "wss://ic-websocket-service.run.aws-usw02-pr.ice.predix.io/events";
+            //"wss://ic-websocket-server.run.aws-usw02-pr.ice.predix.io/events";
         public static string ClientAccessToken { get; set; }
 
         public static readonly string GetListOfLocation =
                 $"{MetaDataUrl}/locations/search?q=locationType:{{locationType}}&bbox={{bbox}}&page={{pageNumber}}&size={{pageSize}}";
 
+        public static readonly string GetLocationDetails =
+            $"{MetaDataUrl}/locations/{{locationUid}}";
         public const string MediaUrl = "https://ic-media-service.run.aws-usw02-pr.ice.predix.io/v2/mediastore";
 
         /// <summary>

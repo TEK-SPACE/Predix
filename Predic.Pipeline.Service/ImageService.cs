@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Data.Entity.Migrations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Predic.Pipeline.DataService;
@@ -47,6 +45,7 @@ namespace Predic.Pipeline.Service
                 select response.Result).FirstOrDefault();
             image.Base64 = imageBinary;
 
+            image.ImageAssetUid = imageAssetUid;
             Save(image);
             return imageBinary;
         }
@@ -55,7 +54,7 @@ namespace Predic.Pipeline.Service
         {
             Media media = null;
             Dictionary<string, string> additionalHeaders =
-                new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PUBLIC-SAFETY" } };
+                new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PUBLIC-SAFETY"}};
             var response = _predixHttpClient.GetAllAsync(Endpoint.MediaOnDemand
                 .Replace("{ps_asset}", imageAssetUid)
                 .Replace("{timestamp}", timestamp), additionalHeaders);
@@ -64,6 +63,7 @@ namespace Predic.Pipeline.Service
             media = jsonRespone != null
                 ? (jsonRespone).ToObject<Media>()
                 : new Media();
+            media.ImageAssetUid = imageAssetUid;
             Save(media);
             return media;
         }
@@ -74,7 +74,7 @@ namespace Predic.Pipeline.Service
                 return;
             using (PredixContext context = new PredixContext())
             {
-                context.Medias.Add(media);
+                context.Medias.AddOrUpdate(x=>x.ImageAssetUid, media);
                 context.SaveChanges();
             }
         }
@@ -85,7 +85,7 @@ namespace Predic.Pipeline.Service
                 return;
             using (PredixContext context = new PredixContext())
             {
-                context.Images.Add(image);
+                context.Images.AddOrUpdate(x => x.ImageAssetUid, image);
                 context.SaveChanges();
             }
         }

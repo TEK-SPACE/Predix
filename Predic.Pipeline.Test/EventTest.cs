@@ -10,11 +10,11 @@ namespace Predic.Pipeline.Test
     class EventTest
     {
         private IEvent _eventService;
-
+        private static Dictionary<string, object> _globalVariables;
         [SetUp]
         public void Init()
         {
-            _eventService = new EventService();
+            _eventService = new EventService(_globalVariables);
         }
         [Test]
         [TestCase("LOCATION-225", "PKIN")]

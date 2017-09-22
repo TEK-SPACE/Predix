@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Predix.Domain.Model.Location
 {
-    [Table("ParkingActivity", Schema ="dbo")]
+    [Table("ParkingEvents", Schema ="dbo")]
     public class ParkingEvent : CommonEntity
     {
         [JsonIgnore]
@@ -14,7 +15,7 @@ namespace Predix.Domain.Model.Location
         /// <para>A unique identifier established by a customer or external resource for a specific location within the monitored area. For example, LOCATION-STG-323.</para>
         /// </summary>
         [JsonProperty(PropertyName = "locationUid")]
-        public string Uid { get; set; }
+        public string LocationUid { get; set; }
         /// <summary>
         /// The customer-defined identifier for a specific asset at this location.
         /// </summary>
@@ -35,18 +36,22 @@ namespace Predix.Domain.Model.Location
         public string Timestamp { get; set; }
 
         [JsonProperty(PropertyName = "properties")]
-        public Properties Properties { get; set; }
+        public ParkingEventProperties Properties { get; set; }
 
         [JsonProperty(PropertyName = "measures")]
         public Measures Measures { get; set; }
         [JsonIgnore]
-        public int ActivityId { get; set; }
+        public int? ActivityId { get; set; }
         [JsonIgnore]
         [ForeignKey("ActivityId")]
         public Activity Activity { get; set; }
 
-        //[JsonIgnore]
-        //[ForeignKey("Uid")]
-        //public Location Identifier { get; set; }
+        [JsonIgnore]
+        [ForeignKey("LocationUid")]
+        public Location Identifier { get; set; }
+
+        [ForeignKey("AssetUid")]
+        public virtual Image Image { get; set; }
+        public virtual List<ParkingEventProperties> Propertieses { get; set; }
     }
 }

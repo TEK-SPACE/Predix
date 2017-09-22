@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Objects;
+using System.Data.Entity.Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Predic.Pipeline.DataService;
@@ -43,7 +43,7 @@ namespace Predic.Pipeline.Service
 
         public ParkingEvent Get(string locationUid, string eventType)
         {
-            ParkingEvent details = null;
+            ParkingEvent parkingEvent = null;
             Dictionary<string, string> additionalHeaders =
                 new Dictionary<string, string> { { "predix-zone-id", "SDSIM-IE-PARKING" } };
             string bodyMessage = $"{{\"locationUid\":\"{locationUid}\",\"eventTypes\":[\"{eventType}\"]}}";
@@ -52,13 +52,13 @@ namespace Predic.Pipeline.Service
             if (!string.IsNullOrWhiteSpace(response.Result))
             {
                 var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
-                details = jsonRespone != null
+                parkingEvent = jsonRespone != null
                     //? ((JArray)jsonRespone["content"]).ToObject<ParkingEvent>()
                     ? (jsonRespone).ToObject<ParkingEvent>()
                     : new ParkingEvent();
             }
-            Save(details);
-            return details;
+            Save(parkingEvent);
+            return parkingEvent;
         }
 
         private void Save(ParkingEvent parkingEvent)
@@ -67,7 +67,7 @@ namespace Predic.Pipeline.Service
                 return;
             using (PredixContext context = new PredixContext())
             {
-                context.Details.Add(parkingEvent);
+                context.ParkingEvents.AddOrUpdate(x => new { x.LocationUid, x.EventType }, parkingEvent);
                 context.SaveChanges();
             }
         }

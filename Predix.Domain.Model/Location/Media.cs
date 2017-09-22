@@ -7,7 +7,8 @@ namespace Predix.Domain.Model.Location
    {
        [JsonIgnore]
        [Key]
-       public int Id { get; set; }
+       [StringLength(250)]
+       public string ImageAssetUid { get; set; }
         [JsonProperty("pollUrl")]
         public string PollUrl { get; set; }
         [JsonProperty("noOfElements")]

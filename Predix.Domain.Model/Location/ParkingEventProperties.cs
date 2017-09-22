@@ -4,8 +4,8 @@ using Newtonsoft.Json;
 
 namespace Predix.Domain.Model.Location
 {
-    [Table("LocationProperties", Schema = "dbo")]
-    public class Properties : CommonEntity
+    [Table("ParkingEventProperties", Schema = "dbo")]
+    public class ParkingEventProperties : CommonEntity
     {
         [JsonIgnore]
         [Key]
@@ -37,18 +37,21 @@ namespace Predix.Domain.Model.Location
         public string ImageAssetUid { get; set; }
 
         [JsonIgnore]
-        public int ActivityId { get; set; }
+        public int? ActivityId { get; set; }
 
         [JsonIgnore]
         [ForeignKey("ActivityId")]
         public Activity Activity { get; set; }
 
         [JsonIgnore]
-        public int LocationUid { get; set; }
+        public string LocationUid { get; set; }
+
+        [JsonIgnore]
+        public int ParkingEventId { get; set; }
 
         //[JsonIgnore]
-        //[ForeignKey("LocationUid")]
-        //public ParkingEvent LocationDetails { get; set; }
+        //[ForeignKey("ParkingEventId")]
+        //public virtual ParkingEvent ParkingEvent { get; set; }
 
         //[JsonIgnore]
         //[ForeignKey("ImageAssetUid")]

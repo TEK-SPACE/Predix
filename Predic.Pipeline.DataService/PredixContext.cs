@@ -11,13 +11,24 @@ namespace Predic.Pipeline.DataService
             this.Configuration.LazyLoadingEnabled = true;
             this.Configuration.ProxyCreationEnabled = false;
         }
-        public DbSet<Location> Identifiers { get; set; }
-        public DbSet<ParkingEvent> Details { get; set; }
+
+        public DbSet<GeViolation> GeViolations { get; set; }
+        public DbSet<NodeMaster> NodeMasters { get; set; }
+        public DbSet<NodeMasterRegulation> NodeMasterRegulations { get; set; }
+        public DbSet<ParkingRegulation> ParkingRegulations { get; set; }
+
+
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<LocationDetails> LocationDetails { get; set; }
+
+        public DbSet<ParkingEvent> ParkingEvents { get; set; }
+        public DbSet<ParkingEventProperties> ParkingEventProperties { get; set; }
+
         public DbSet<Media> Medias { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Content> ImageContents { get; set; }
         public DbSet<Measures> Measures { get; set; }
-        public DbSet<Properties> Properties { get; set; }
         public DbSet<Activity> Activities { get; set; }
+     
     }
 }
