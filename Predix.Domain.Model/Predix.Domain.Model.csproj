@@ -49,6 +49,8 @@
     <Compile Include="Activity.cs" />
     <Compile Include="CommonEntity.cs" />
     <Compile Include="Constant\Endpoint.cs" />
+    <Compile Include="Constant\GeorgiaPowerAtlantaEndpoints.cs" />
+    <Compile Include="Constant\StagingEndpoints.cs" />
     <Compile Include="Enum\ActivityType.cs" />
     <Compile Include="GeViolation.cs" />
     <Compile Include="Location\Image.cs" />

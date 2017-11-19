@@ -28,8 +28,8 @@ namespace Predic.Pipeline.Service
             int pageNumber = 0;
             int totalPages = 1;
             Dictionary<string, string> additionalHeaders =
-                //new Dictionary<string, string> {{"Predix-Zone-Id", "ics-IE-PARKING"}};
-                new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PARKING"}};
+                new Dictionary<string, string> {{"Predix-Zone-Id", "GPATL-IE-PARKING" } };
+                //new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PARKING"}};
             while (totalPages - 1 >= pageNumber)
             {
                 var response = _predixHttpClient.GetAllAsync(Endpoint.GetListOfLocation
