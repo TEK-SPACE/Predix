@@ -22,7 +22,7 @@ namespace Predix.Domain.Model.Constant
             }
         }
         public static readonly string GetListOfLocation =
-            $"{MetaDataUrl}/locations/search?q=locationType:{{locationType}}&bbox={{bbox}}&page={{pageNumber}}&size={{pageSize}}";
+            $"{MetaDataUrl}/v2/metadata/locations/search?q=locationType:{{locationType}}&bbox={{bbox}}&page={{pageNumber}}&size={{pageSize}}";
 
         public static readonly string GetLocationDetails =
             $"{MetaDataUrl}/locations/{{locationUid}}";

@@ -40,14 +40,30 @@ namespace Predic.Pipeline.Service
             }
             return details;
         }
-
+        public ParkingEvent GetByBoundary(string bbox, string eventType1, string eventType2)
+        {
+            ParkingEvent parkingEvent = null;
+            Dictionary<string, string> additionalHeaders =
+                new Dictionary<string, string> { { "predix-zone-id", "GPATL-IE-PARKING" } };
+            string bodyMessage = $"{{\"bbox\":\"{bbox}\",\"eventTypes\":[\"{eventType1}\",\"{eventType2}\" ]}}";
+            var response = _predixWebSocketClient.GetAllAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders);
+            if (!string.IsNullOrWhiteSpace(response.Result))
+            {
+                var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
+                parkingEvent = jsonRespone != null
+                    //? ((JArray)jsonRespone["content"]).ToObject<ParkingEvent>()
+                    ? (jsonRespone).ToObject<ParkingEvent>()
+                    : new ParkingEvent();
+            }
+            //Save(parkingEvent);
+            return parkingEvent;
+        }
         public ParkingEvent Get(string locationUid, string eventType)
         {
             ParkingEvent parkingEvent = null;
             Dictionary<string, string> additionalHeaders =
-                new Dictionary<string, string> { { "predix-zone-id", "SDSIM-IE-PARKING" } };
+                new Dictionary<string, string> { { "predix-zone-id", "GPATL-IE-PARKING" } };
             string bodyMessage = $"{{\"locationUid\":\"{locationUid}\",\"eventTypes\":[\"{eventType}\"]}}";
-            //string bodyMessage = $"{{\"bbox\":\"32.715675:-117.161230,32.708498:-117.151681\",\"eventTypes\":[\"PKIN\"]}}";
             var response = _predixWebSocketClient.GetAllAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders);
             if (!string.IsNullOrWhiteSpace(response.Result))
             {

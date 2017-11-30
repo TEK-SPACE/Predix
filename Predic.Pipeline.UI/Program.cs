@@ -19,7 +19,7 @@ namespace Predic.Pipeline.UI
         static void Main(string[] args)
         {
             Init();
-            var bbox = "32.715675:-117.161230,32.708498:-117.151681";
+            var bbox = "33.974968:-84.736467,33.492143:-84.035631";// "32.715675:-117.161230,32.708498:-117.151681";
             var locationType = "PARKING_ZONE";
             int pagesize = 50;
             Commentary.Print($"Calling Get All Locations by BBOX & Location Type");
@@ -35,21 +35,22 @@ namespace Predic.Pipeline.UI
             foreach (var location in locations)
             {
                 Commentary.Print($"Get Parking Events for");
-                DateTime startDate = new DateTime(2017, 04, 28, 18, 58, 57, DateTimeKind.Utc);
-                DateTime endDate = new DateTime(2017, 04, 28, 19, 12, 17, DateTimeKind.Utc);
+                //DateTime startDate = new DateTime(2017, 11, 28, 18, 58, 57, DateTimeKind.Utc);
+                //DateTime endDate = new DateTime(2017, 11, 29, 19, 12, 17, DateTimeKind.Utc);
                 var eventTypes = new[] {"PKIN", "PKOUT"};
-                foreach (var eventType in eventTypes)
-                {
+                //foreach (var eventType in eventTypes)
+                //{
                     Commentary.Print($"Location UID: {location.LocationUid}", true);
-                    Commentary.Print($"Event Type : {eventType}", true);
-                    Commentary.Print($"Start Date : {startDate:G}", true);
-                    Commentary.Print($"End Date : {endDate:G}", true);
+                Commentary.Print($"bbox : {bbox}", true);
+                // Commentary.Print($"Event Type : {eventType}", true);
+                //Commentary.Print($"Start Date : {startDate:G}", true);
+                //Commentary.Print($"End Date : {endDate:G}", true);
 
-                    var parkingEvent = _eventService.Get(location.LocationUid, eventType);
-                    parkingEventsForAllLocations.Add(parkingEvent);
-                    Commentary.Print($"Event Type: {eventType}, Location UID: {location.LocationUid} Asset UID:{parkingEvent.AssetUid}");
-                   _imageService.MediaOnDemand(parkingEvent.AssetUid, parkingEvent.Timestamp);
-                }
+                var parkingEvent = _eventService.GetByBoundary(bbox, "PKIN","PKOUT");
+                    //parkingEventsForAllLocations.Add(parkingEvent);
+                    //Commentary.Print($"Event Type: {eventType}, Location UID: {location.LocationUid} Asset UID:{parkingEvent.AssetUid}");
+                   _imageService.MediaOnDemand(parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
+                //}
             }
             Commentary.Print($"Total Events for all locations: {parkingEventsForAllLocations.Count}");
             //foreach (var parkingEvent in parkingEventsForAllLocations)

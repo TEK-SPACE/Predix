@@ -22,12 +22,12 @@
         /// Websocket URL (Access for realtime)
         /// </summary>
         public const string WebSocketUrlForEvents =
-            "https://ic-websocket-service-atlanta.run.aws-usw02-pr.ice.predix.io";
+            "wss://ic-websocket-service-atlanta.run.aws-usw02-pr.ice.predix.io/events";
 
         /// <summary>
         /// Media Services URL (Images and video)
         /// </summary>
-        protected const string MediaUrl = "https://ic-media-service-atlanta.run.aws-usw02-pr.ice.predix.io";
+        protected const string MediaUrl = "https://ic-media-service-atlanta.run.aws-usw02-pr.ice.predix.io/v2/mediastore";
 
         /// <summary>
         /// wss://{{production url}}/events

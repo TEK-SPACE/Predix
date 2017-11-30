@@ -13,6 +13,9 @@ namespace Predic.Pipeline.Interface
         /// <param name="eventType">Filter for pedestrian events<example>["PKIN,PKOUT"]</example></param>
         /// <returns></returns>
         ParkingEvent Get(string locationUid, string eventType);
+
+        ParkingEvent GetByBoundary(string bbox, string eventType1, string eventType2);
+
         /// <summary>
         /// 
         /// </summary>
