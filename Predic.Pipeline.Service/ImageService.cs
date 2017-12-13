@@ -22,18 +22,18 @@ namespace Predic.Pipeline.Service
             _globalVariables = globalVariables;
         }
 
-        public string MediaOnDemand(string imageAssetUid, string timestamp)
+        public void MediaOnDemand(string imageAssetUid, string timestamp)
         {
-            var media = GetMedia(imageAssetUid, timestamp);
-            Image image = new Image ();
+            var media = GetMedia(imageAssetUid, timestamp).Result;
+            Image image = new Image();
             var i = 1;
-            while (i < 5 && (image?.Entry == null || !image.Entry.Contents.Any(x=>x.Status.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))))
+            while (i < 5 && (image?.Entry == null || !image.Entry.Contents.Any(x => x.Status.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))))
             {
                 i++;
                 if (!string.IsNullOrWhiteSpace(media?.PollUrl))
                 {
                     Dictionary<string, string> additionalHeaders =
-                        new Dictionary<string, string> { { "predix-zone-id", "GPATL-IE-IMAGE" } };
+                        new Dictionary<string, string> { { "predix-zone-id", Endpoint.PredixZoneIdForImage } };
                     var response = _predixHttpClient.GetAllAsync(media.PollUrl, additionalHeaders);
                     if (!string.IsNullOrWhiteSpace(response.Result))
                     {
@@ -50,55 +50,54 @@ namespace Predic.Pipeline.Service
                     continue;
                 }
                 var imageBinary = (from content in image.Entry.Contents
-                    let additionalHeaders = new Dictionary<string, string> { { "predix-zone-id", "GPATL-IE-IMAGE" } }
-                    select _predixHttpClient.GetFile(content.Url, additionalHeaders)
+                                   let additionalHeaders = new Dictionary<string, string> { { "predix-zone-id", Endpoint.PredixZoneIdForImage } }
+                                   select _predixHttpClient.GetFile(content.Url, additionalHeaders)
                     into response
-                    select response.Result).FirstOrDefault();
+                                   select response.Result).FirstOrDefault();
                 image.Base64 = imageBinary;
             }
-            if (image == null) return null;
+            if (image == null) return;
             image.ImageAssetUid = imageAssetUid;
-            //Save(image);
-            return image.Base64;
+            //SaveAsync(image).RunSynchronously();
+            //return image.Base64;
         }
 
-        private Media GetMedia(string imageAssetUid, string timestamp)
+        private async Task<Media> GetMedia(string imageAssetUid, string timestamp)
         {
-            Media media = null;
             Dictionary<string, string> additionalHeaders =
-                new Dictionary<string, string> {{"predix-zone-id", "GPATL-IE-IMAGE" } };
+                new Dictionary<string, string> {{"predix-zone-id", Endpoint.PredixZoneIdForImage } };
             var response = _predixHttpClient.GetAllAsync(Endpoint.MediaOnDemand
                 .Replace("{ps_asset}", imageAssetUid)
                 .Replace("{timestamp}", timestamp), additionalHeaders);
             if (string.IsNullOrWhiteSpace(response.Result)) return null;
             var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
-            media = jsonRespone != null
+            var media = jsonRespone != null
                 ? (jsonRespone).ToObject<Media>()
                 : new Media();
             media.ImageAssetUid = imageAssetUid;
-            //Save(media);
+            await SaveAsync(media);
             return media;
         }
 
-        private void Save(Media media)
+        private async Task SaveAsync(Media media)
         {
             if (media == null)
                 return;
             using (PredixContext context = new PredixContext())
             {
-                context.Medias.AddOrUpdate(x=>x.ImageAssetUid, media);
-                context.SaveChanges();
+                context.Medias.AddOrUpdate(x => x.ImageAssetUid, media);
+                await context.SaveChangesAsync();
             }
         }
 
-        private void Save(Image image)
+        private async Task SaveAsync(Image image)
         {
             if (image == null)
                 return;
             using (PredixContext context = new PredixContext())
             {
                 context.Images.AddOrUpdate(x => x.ImageAssetUid, image);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
     }

@@ -42,16 +42,16 @@ namespace Predix.Domain.Model.Location
         public Measures Measures { get; set; }
         [JsonIgnore]
         public int? ActivityId { get; set; }
-        [JsonIgnore]
-        [ForeignKey("ActivityId")]
-        public Activity Activity { get; set; }
+        //[JsonIgnore]
+        //[ForeignKey("ActivityId")]
+        //public Activity Activity { get; set; }
 
-        [JsonIgnore]
-        [ForeignKey("LocationUid")]
-        public Location Identifier { get; set; }
+        //[JsonIgnore]
+        //[ForeignKey("LocationUid")]
+        //public Location Identifier { get; set; }
 
-        [ForeignKey("AssetUid")]
-        public virtual Image Image { get; set; }
+        //[ForeignKey("AssetUid")]
+        //public virtual Image Image { get; set; }
         public virtual List<ParkingEventProperties> Propertieses { get; set; }
     }
 }

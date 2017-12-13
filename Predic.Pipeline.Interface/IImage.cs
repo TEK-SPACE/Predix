@@ -1,4 +1,5 @@
-﻿using Predix.Domain.Model.Location;
+﻿using System.Threading.Tasks;
+using Predix.Domain.Model.Location;
 
 namespace Predic.Pipeline.Interface
 {
@@ -8,7 +9,8 @@ namespace Predic.Pipeline.Interface
         /// 
         /// </summary>
         /// <param name="imageAssetUid"></param>
+        /// <param name="timestamp"></param>
         /// <returns>Base64 Image</returns>
-        string MediaOnDemand(string imageAssetUid, string timestamp);
+        void MediaOnDemand(string imageAssetUid, string timestamp);
     }
 }

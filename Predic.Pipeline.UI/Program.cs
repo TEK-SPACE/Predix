@@ -16,10 +16,11 @@ namespace Predic.Pipeline.UI
         private static IEvent _eventService;
         private static IImage _imageService;
         private static readonly Dictionary<string, object> GlobalVariables = new Dictionary<string, object>();
+
         static void Main(string[] args)
         {
             Init();
-            var bbox = "33.974968:-84.736467,33.492143:-84.035631";// "32.715675:-117.161230,32.708498:-117.151681";
+            var bbox = "33.974968:-84.736467,33.492143:-84.035631"; // "32.715675:-117.161230,32.708498:-117.151681";
             var locationType = "PARKING_ZONE";
             int pagesize = 50;
             Commentary.Print($"Calling Get All Locations by BBOX & Location Type");
@@ -28,31 +29,33 @@ namespace Predic.Pipeline.UI
             var locations = _locationService.All(bbox, locationType, pagesize);
             Commentary.Print($"Total Locations: {locations.Count}");
 
-            _locationService.Details(locations.Select(x=>x.LocationUid).Distinct().ToList());
+            _locationService.Details(locations.Select(x => x.LocationUid).Distinct().ToList());
+            _eventService.GetByBoundary(bbox, "PKIN", "PKOUT", _imageService);
+            //var parkingEvent = _eventService.GetByBoundary(bbox, "PKIN", "PKOUT");
+            //_imageService.MediaOnDemand(parkingEvent.Result.Properties.ImageAssetUid, parkingEvent.Result.Timestamp);
+            //var parkingEventsForAllLocations = new List<ParkingEvent>();
 
-            var parkingEventsForAllLocations = new List<ParkingEvent>();
-           
-            foreach (var location in locations)
-            {
-                Commentary.Print($"Get Parking Events for");
-                //DateTime startDate = new DateTime(2017, 11, 28, 18, 58, 57, DateTimeKind.Utc);
-                //DateTime endDate = new DateTime(2017, 11, 29, 19, 12, 17, DateTimeKind.Utc);
-                var eventTypes = new[] {"PKIN", "PKOUT"};
-                //foreach (var eventType in eventTypes)
-                //{
-                    Commentary.Print($"Location UID: {location.LocationUid}", true);
-                Commentary.Print($"bbox : {bbox}", true);
-                // Commentary.Print($"Event Type : {eventType}", true);
-                //Commentary.Print($"Start Date : {startDate:G}", true);
-                //Commentary.Print($"End Date : {endDate:G}", true);
+            //foreach (var location in locations)
+            //{
+            //    Commentary.Print($"Get Parking Events for");
+            //    //DateTime startDate = new DateTime(2017, 11, 28, 18, 58, 57, DateTimeKind.Utc);
+            //    //DateTime endDate = new DateTime(2017, 11, 29, 19, 12, 17, DateTimeKind.Utc);
+            //    var eventTypes = new[] {"PKIN", "PKOUT"};
+            //    //foreach (var eventType in eventTypes)
+            //    //{
+            //    Commentary.Print($"Location UID: {location.LocationUid}", true);
+            //    Commentary.Print($"bbox : {bbox}", true);
+            //    // Commentary.Print($"Event Type : {eventType}", true);
+            //    //Commentary.Print($"Start Date : {startDate:G}", true);
+            //    //Commentary.Print($"End Date : {endDate:G}", true);
 
-                var parkingEvent = _eventService.GetByBoundary(bbox, "PKIN","PKOUT");
-                    //parkingEventsForAllLocations.Add(parkingEvent);
-                    //Commentary.Print($"Event Type: {eventType}, Location UID: {location.LocationUid} Asset UID:{parkingEvent.AssetUid}");
-                   _imageService.MediaOnDemand(parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
-                //}
-            }
-            Commentary.Print($"Total Events for all locations: {parkingEventsForAllLocations.Count}");
+            //    var parkingEvent = _eventService.GetByBoundary(bbox, "PKIN", "PKOUT");
+            //    //parkingEventsForAllLocations.Add(parkingEvent);
+            //    //Commentary.Print($"Event Type: {eventType}, Location UID: {location.LocationUid} Asset UID:{parkingEvent.AssetUid}");
+            //    _imageService.MediaOnDemand(parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
+            //    //}
+            //}
+            //Commentary.Print($"Total Events for all locations: {parkingEventsForAllLocations.Count}");
             //foreach (var parkingEvent in parkingEventsForAllLocations)
             //{
             //    var imageAsset = _imageService.MediaOnDemand(parkingEvent.AssetUid, parkingEvent.Timestamp);

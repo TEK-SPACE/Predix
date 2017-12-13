@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Predix.Domain.Model.Location;
 
 namespace Predic.Pipeline.Interface
@@ -11,10 +12,18 @@ namespace Predic.Pipeline.Interface
         /// </summary>
         /// <param name="locationUid">The identifier assigned to this location<example>LOCATION-282</example></param>
         /// <param name="eventType">Filter for pedestrian events<example>["PKIN,PKOUT"]</example></param>
+        /// <param name="imageService"></param>
         /// <returns></returns>
-        ParkingEvent Get(string locationUid, string eventType);
+        void GetByLocation(string locationUid, string eventType, IImage imageService);
 
-        ParkingEvent GetByBoundary(string bbox, string eventType1, string eventType2);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bbox"></param>
+        /// <param name="eventType1"></param>
+        /// <param name="eventType2"></param>
+        /// <param name="imageService"></param>
+        void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService);
 
         /// <summary>
         /// 

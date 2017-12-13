@@ -19,7 +19,7 @@ namespace Predic.Pipeline.Test
         [TestCase("ba8fc508-e362-43f3-8149-9605459c0896", "1512071220607")]
         public void MediaOnDemandTest(string imageAssetUid, string timestamp)
         {
-            var results = _imageService.MediaOnDemand(imageAssetUid, timestamp);
+            _imageService.MediaOnDemand(imageAssetUid, timestamp);
         }
     }
 }

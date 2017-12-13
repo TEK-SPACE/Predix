@@ -28,8 +28,7 @@ namespace Predic.Pipeline.Service
             int pageNumber = 0;
             int totalPages = 1;
             Dictionary<string, string> additionalHeaders =
-                new Dictionary<string, string> {{"Predix-Zone-Id", "GPATL-IE-PARKING" } };
-                //new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PARKING"}};
+                new Dictionary<string, string> {{"Predix-Zone-Id", Endpoint.PredixZoneIdForParking } };
             while (totalPages - 1 >= pageNumber)
             {
                 var response = _predixHttpClient.GetAllAsync(Endpoint.GetListOfLocation
@@ -53,7 +52,7 @@ namespace Predic.Pipeline.Service
         public List<LocationDetails> Details(List<string> locationUids)
         {
             Dictionary<string, string> additionalHeaders =
-                new Dictionary<string, string> {{"predix-zone-id", "SDSIM-IE-PARKING"}};
+                new Dictionary<string, string> { { "Predix-Zone-Id", Endpoint.PredixZoneIdForParking } };
             List<LocationDetails> locationDetailsList = new List<LocationDetails>();
             foreach (var locationUid in locationUids)
             {

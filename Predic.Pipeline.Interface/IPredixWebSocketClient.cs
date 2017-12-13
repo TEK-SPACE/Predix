@@ -8,6 +8,7 @@ namespace Predic.Pipeline.Interface
 {
     public interface IPredixWebSocketClient
     {
-        Task<string> GetAllAsync(string url, string bodyMessage, Dictionary<string, string> additionalHeaders);
+        Task OpenAsync(string url, string bodyMessage, Dictionary<string, string> additionalHeaders,
+            IImage imageService);
     }
 }

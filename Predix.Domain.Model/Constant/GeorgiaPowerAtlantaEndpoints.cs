@@ -35,5 +35,8 @@
         /// <example>{“locationUid":"LOCATION-282","eventTypes":["PKIN,PKOUT"]}</example></para>
         /// </summary>
         public const string NearRealTimeDataByLocationUid = "wss://<production url>/events";
+
+        public const string PredixZoneIdForParking = "GPATL-IE-PARKING";
+        public const string PredixZoneIdForImage = "GPATL-IE-IMAGE";
     }
 }
