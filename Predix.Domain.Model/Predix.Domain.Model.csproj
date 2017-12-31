@@ -52,6 +52,7 @@
     <Compile Include="Constant\GeorgiaPowerAtlantaEndpoints.cs" />
     <Compile Include="Constant\StagingEndpoints.cs" />
     <Compile Include="Enum\ActivityType.cs" />
+    <Compile Include="Enum\ViolationType.cs" />
     <Compile Include="GeViolation.cs" />
     <Compile Include="Location\Image.cs" />
     <Compile Include="Location\LocalDetailAnalyticCategory.cs" />
@@ -69,7 +70,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PredixClassDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

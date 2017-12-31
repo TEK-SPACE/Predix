@@ -41,13 +41,13 @@ namespace Predic.Pipeline.Service
             }
             return details;
         }
-        public void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService)
+        public void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService, bool ignoreRegulationCheck)
         {
             //ParkingEvent parkingEvent = null;
             Dictionary<string, string> additionalHeaders =
                 new Dictionary<string, string> { { "predix-zone-id",  Endpoint.PredixZoneIdForParking } };
             string bodyMessage = $"{{\"bbox\":\"{bbox}\",\"eventTypes\":[\"{eventType1}\",\"{eventType2}\" ]}}";
-            _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders, imageService);
+            _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders, imageService, ignoreRegulationCheck).Wait();
             //if (!string.IsNullOrWhiteSpace(response.Result))
             //{
             //    var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
@@ -64,7 +64,7 @@ namespace Predic.Pipeline.Service
             Dictionary<string, string> additionalHeaders =
                 new Dictionary<string, string> { { "predix-zone-id", Endpoint.PredixZoneIdForParking } };
             string bodyMessage = $"{{\"locationUid\":\"{locationUid}\",\"eventTypes\":[\"{eventType}\"]}}";
-             _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders, imageService);
+             _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders, imageService, false);
             //if (!string.IsNullOrWhiteSpace(response.Result))
             //{
             //    var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);

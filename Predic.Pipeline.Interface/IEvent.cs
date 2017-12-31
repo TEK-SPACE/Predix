@@ -23,7 +23,8 @@ namespace Predic.Pipeline.Interface
         /// <param name="eventType1"></param>
         /// <param name="eventType2"></param>
         /// <param name="imageService"></param>
-        void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService);
+        /// <param name="ignoreRegulationCheck"></param>
+        void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService, bool ignoreRegulationCheck);
 
         /// <summary>
         /// 

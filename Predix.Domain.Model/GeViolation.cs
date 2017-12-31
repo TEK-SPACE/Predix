@@ -12,8 +12,8 @@ namespace Predix.Domain.Model
         public bool ExceedParkingLimit { get; set; }
         public bool StreetSweeping { get; set; }
 
-        public TimeSpan ParkinTime { get; set; }
-        public TimeSpan ParkoutTime { get; set; }
+        public TimeSpan? ParkinTime { get; set; }
+        public TimeSpan? ParkoutTime { get; set; }
         /// <summary>
         /// Duration in Minutes
         /// </summary>

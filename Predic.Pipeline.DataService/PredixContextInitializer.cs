@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity.Migrations;
 using Predix.Domain.Model;
+using Predix.Domain.Model.Enum;
 
 namespace Predic.Pipeline.DataService
 {
@@ -40,7 +41,9 @@ namespace Predic.Pipeline.DataService
                 Metered = false,
                 HourlyRate = 0,
                 EndTime = new TimeSpan(23, 59, 59),
-                StartTime = new TimeSpan(00, 00, 00)
+                StartTime = new TimeSpan(00, 00, 00),
+                IsActive = true,
+                ViolationType = ViolationType.NoParking
             });
             context.ParkingRegulations.AddOrUpdate(x => x.RegualationId, new ParkingRegulation
             {
@@ -57,7 +60,9 @@ namespace Predic.Pipeline.DataService
                 Metered = true,
                 HourlyRate = 1,
                 EndTime = new TimeSpan(21, 00, 00),
-                StartTime = new TimeSpan(09, 00, 00)
+                StartTime = new TimeSpan(09, 00, 00),
+                IsActive = true,
+                ViolationType = ViolationType.ExceedParkingLimit
             });
             context.ParkingRegulations.AddOrUpdate(x => x.RegualationId, new ParkingRegulation
             {
@@ -74,7 +79,9 @@ namespace Predic.Pipeline.DataService
                 Metered = false,
                 HourlyRate = 0,
                 EndTime = new TimeSpan(08, 00, 00),
-                StartTime = new TimeSpan(07, 00, 00)
+                StartTime = new TimeSpan(07, 00, 00),
+                IsActive = true,
+                ViolationType = ViolationType.StreetSweeping
             });
             base.Seed(context);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Predix.Domain.Model.Enum;
 
 namespace Predix.Domain.Model
 {
@@ -20,5 +21,7 @@ namespace Predix.Domain.Model
         public string Coodrinate3 { get; set; }
         public string Coodrinate4 { get; set; }
         public string Address { get; set; }
+        public ViolationType ViolationType { get; set; }
+        public bool IsActive { get; set; }
     }
 }

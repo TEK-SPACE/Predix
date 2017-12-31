@@ -9,6 +9,6 @@ namespace Predic.Pipeline.Interface
     public interface IPredixWebSocketClient
     {
         Task OpenAsync(string url, string bodyMessage, Dictionary<string, string> additionalHeaders,
-            IImage imageService);
+            IImage imageService, bool ignoreRegulationCheck);
     }
 }

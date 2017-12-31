@@ -23,14 +23,20 @@ namespace Predic.Pipeline.UI
             var bbox = "33.974968:-84.736467,33.492143:-84.035631"; // "32.715675:-117.161230,32.708498:-117.151681";
             var locationType = "PARKING_ZONE";
             int pagesize = 50;
-            Commentary.Print($"Calling Get All Locations by BBOX & Location Type");
-            Commentary.Print($"BBOX: {bbox}", true);
-            Commentary.Print($"Location Type: {locationType}", true);
-            var locations = _locationService.All(bbox, locationType, pagesize);
-            Commentary.Print($"Total Locations: {locations.Count}");
+            Commentary.Print($"BBOX: {bbox}");
+            Commentary.Print($"Location Type: {locationType}");
+            var refreshNodeMaster = Convert.ToBoolean(args[0]);
+            var ignoreRegulationCheck = Convert.ToBoolean(args[1]);
+            if (refreshNodeMaster)
+            {
+                Commentary.Print($"Calling Get All Locations by BBOX & Location Type");
+                //Commentary.Print($"Refreshing Node(Local) Data", true);
+                var locations = _locationService.All(bbox, locationType, pagesize);
+                Commentary.Print($"Total Locations: {locations.Count}");
+                _locationService.Details(locations.Select(x => x.LocationUid).Distinct().ToList());
+            }
 
-            _locationService.Details(locations.Select(x => x.LocationUid).Distinct().ToList());
-            _eventService.GetByBoundary(bbox, "PKIN", "PKOUT", _imageService);
+            _eventService.GetByBoundary(bbox, "PKIN", "PKOUT", _imageService, ignoreRegulationCheck);
             //var parkingEvent = _eventService.GetByBoundary(bbox, "PKIN", "PKOUT");
             //_imageService.MediaOnDemand(parkingEvent.Result.Properties.ImageAssetUid, parkingEvent.Result.Timestamp);
             //var parkingEventsForAllLocations = new List<ParkingEvent>();

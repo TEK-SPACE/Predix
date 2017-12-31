@@ -52,6 +52,7 @@ namespace Predic.Pipeline.Service
         }
         public async Task<string> GetFile(string url, Dictionary<string, string> additionalHeaders)
         {
+            Commentary.Print($"Fething Image Base64", true);
             _securityService.SetClientToken().Wait();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
                                                    SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -81,9 +82,9 @@ namespace Predic.Pipeline.Service
                     using (HttpContent httpContent = httpResponseMessage.Content)
                     {
                         var result = await httpContent.ReadAsByteArrayAsync();
-                        var imageUrl = $"data:image/jpg;base64," +
+                        var base64 = $"data:image/jpg;base64," +
                                        Convert.ToBase64String(result);
-                        return imageUrl;
+                        return base64;
                     }
                 }
             }

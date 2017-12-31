@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Predic.Pipeline.DataService;
+using Predic.Pipeline.Helper;
 using Predic.Pipeline.Interface;
 using Predix.Domain.Model.Constant;
 using Predix.Domain.Model.Location;
@@ -24,7 +25,7 @@ namespace Predic.Pipeline.Service
 
         public void MediaOnDemand(string imageAssetUid, string timestamp)
         {
-            var media = GetMedia(imageAssetUid, timestamp).Result;
+            var media = GetMedia(imageAssetUid, timestamp);
             Image image = new Image();
             var i = 1;
             while (i < 5 && (image?.Entry == null || !image.Entry.Contents.Any(x => x.Status.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))))
@@ -46,6 +47,7 @@ namespace Predic.Pipeline.Service
                 if (image?.Entry == null ||
                     !image.Entry.Contents.Any(x => x.Status.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase)))
                 {
+                    Commentary.Print($"Polling for Media Data {i} time", true);
                     System.Threading.Thread.Sleep(1000 * 60);
                     continue;
                 }
@@ -58,12 +60,13 @@ namespace Predic.Pipeline.Service
             }
             if (image == null) return;
             image.ImageAssetUid = imageAssetUid;
-            //SaveAsync(image).RunSynchronously();
+            Save(image);
             //return image.Base64;
         }
 
-        private async Task<Media> GetMedia(string imageAssetUid, string timestamp)
+        private Media GetMedia(string imageAssetUid, string timestamp)
         {
+            Commentary.Print($"Fething Media Data", true);
             Dictionary<string, string> additionalHeaders =
                 new Dictionary<string, string> {{"predix-zone-id", Endpoint.PredixZoneIdForImage } };
             var response = _predixHttpClient.GetAllAsync(Endpoint.MediaOnDemand
@@ -75,7 +78,7 @@ namespace Predic.Pipeline.Service
                 ? (jsonRespone).ToObject<Media>()
                 : new Media();
             media.ImageAssetUid = imageAssetUid;
-            await SaveAsync(media);
+            Save(media);
             return media;
         }
 
@@ -85,19 +88,32 @@ namespace Predic.Pipeline.Service
                 return;
             using (PredixContext context = new PredixContext())
             {
+                Commentary.Print($"Saving Media Data");
                 context.Medias.AddOrUpdate(x => x.ImageAssetUid, media);
                 await context.SaveChangesAsync();
             }
         }
+        private void Save(Media media)
+        {
+            if (media == null)
+                return;
+            using (PredixContext context = new PredixContext())
+            {
+                Commentary.Print($"Saving Media Data", true);
+                context.Medias.AddOrUpdate(x => x.ImageAssetUid, media);
+                context.SaveChanges();
+            }
+        }
 
-        private async Task SaveAsync(Image image)
+        private void Save(Image image)
         {
             if (image == null)
                 return;
             using (PredixContext context = new PredixContext())
             {
+                Commentary.Print($"Saving Base64", true);
                 context.Images.AddOrUpdate(x => x.ImageAssetUid, image);
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
     }

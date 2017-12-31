@@ -52,6 +52,8 @@ namespace Predix.Domain.Model.Location
 
         //[ForeignKey("AssetUid")]
         //public virtual Image Image { get; set; }
+        [JsonIgnore]
+        public bool DurationCheck { get; set; }
         public virtual List<ParkingEventProperties> Propertieses { get; set; }
     }
 }

@@ -16,6 +16,6 @@ namespace Predix.Domain.Model
         public int RegulationId { get; set; }
 
         [ForeignKey("RegulationId")]
-        public ParkingRegulation ParkingRegulation { get; set; }
+        public virtual ParkingRegulation ParkingRegulation { get; set; }
     }
 }
