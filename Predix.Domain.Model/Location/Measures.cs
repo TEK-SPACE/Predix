@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Predix.Domain.Model.Location
 {
-    [Table("LocationMeasures", Schema = "dbo")]
+    [Table("EventMeasures", Schema = "dbo")]
     public class Measures : CommonEntity
     {
         [JsonIgnore]

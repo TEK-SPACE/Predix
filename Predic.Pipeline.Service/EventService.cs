@@ -47,7 +47,12 @@ namespace Predic.Pipeline.Service
             Dictionary<string, string> additionalHeaders =
                 new Dictionary<string, string> { { "predix-zone-id",  Endpoint.PredixZoneIdForParking } };
             string bodyMessage = $"{{\"bbox\":\"{bbox}\",\"eventTypes\":[\"{eventType1}\",\"{eventType2}\" ]}}";
-            _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders, imageService, ignoreRegulationCheck).Wait();
+            while (true)
+            {
+                _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders,
+                    imageService, ignoreRegulationCheck).Wait();
+            }
+
             //if (!string.IsNullOrWhiteSpace(response.Result))
             //{
             //    var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);

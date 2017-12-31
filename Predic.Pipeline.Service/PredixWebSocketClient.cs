@@ -50,7 +50,6 @@ namespace Predic.Pipeline.Service
                 catch (Exception exception)
                 {
                     Console.WriteLine(exception);
-                    throw;
                 }
 
                 while (clientWebSocket.State == WebSocketState.Open)
@@ -81,6 +80,8 @@ namespace Predic.Pipeline.Service
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
+                        Commentary.Print($"WebSocket State:{clientWebSocket.State}");
+                        continue;
                     }
 
                     if (string.IsNullOrWhiteSpace(response)) continue;
@@ -157,6 +158,7 @@ namespace Predic.Pipeline.Service
                     Save(parkingEvent);
                     imageService.MediaOnDemand(parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
                 }
+                Commentary.Print($"WebSocket State:{clientWebSocket.State}");
             }
         }
 
