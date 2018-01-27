@@ -11,7 +11,7 @@ namespace Predic.Pipeline.DataService
             this.Configuration.LazyLoadingEnabled = true;
             this.Configuration.ProxyCreationEnabled = false;
         }
-
+        public DbSet<Boundary> Boundaries { get; set; }
         public DbSet<GeViolation> GeViolations { get; set; }
         public DbSet<NodeMaster> NodeMasters { get; set; }
         public DbSet<NodeMasterRegulation> NodeMasterRegulations { get; set; }

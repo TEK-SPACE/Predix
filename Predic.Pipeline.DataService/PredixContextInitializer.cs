@@ -15,6 +15,7 @@ namespace Predic.Pipeline.DataService
 
         protected override void Seed(PredixContext context)
         {
+            context.Boundaries.AddOrUpdate(x => x.Id, new Boundary() { Id = 1, Range = "33.974968:-84.736467,33.492143:-84.035631", Description = "Atlanta", IsActive = true});
             context.Activities.AddOrUpdate(x => x.Id, new Activity { Id = 1, ProcessDateTime = DateTime.Now, Error = "App Started"});
             context.NodeMasters.AddOrUpdate(x=>x.Id, new NodeMaster[]
             {

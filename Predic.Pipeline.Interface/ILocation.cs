@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Predix.Domain.Model;
 using Predix.Domain.Model.Location;
 
 namespace Predic.Pipeline.Interface
@@ -24,5 +25,6 @@ namespace Predic.Pipeline.Interface
 
         void SaveLocationKeys(List<Location> locationKeys);
         void SaveLocationDetails(List<LocationDetails> locationDetailsList);
+        List<Boundary> GetBoundaries();
     }
 }

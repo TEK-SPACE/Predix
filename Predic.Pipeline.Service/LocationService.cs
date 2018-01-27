@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Predic.Pipeline.DataService;
 using Predic.Pipeline.Interface;
+using Predix.Domain.Model;
 using Predix.Domain.Model.Constant;
 using Predix.Domain.Model.Location;
 
@@ -99,6 +100,14 @@ namespace Predic.Pipeline.Service
                     context.LocationDetails.AddOrUpdate(x => x.LocationUid, locationDetails);
                 }
                 context.SaveChanges();
+            }
+        }
+
+        public List<Boundary> GetBoundaries()
+        {
+            using (PredixContext context = new PredixContext())
+            {
+                return context.Boundaries.Where(x => x.IsActive).ToList();
             }
         }
     }
