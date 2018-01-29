@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
+using System.Device.Location;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
@@ -112,7 +114,56 @@ namespace Predic.Pipeline.Service
                                 .ToList();
                         if (nodeMasterRegulation.Any())
                         {
-                            foreach (var regulation in nodeMasterRegulation.Select(x => x.ParkingRegulation))
+                            var latLongs = parkingEvent.Properties.GeoCoordinates.Split(',').ToList();
+                            //var geoCoordinates = new List<GeoCoordinate>();
+                            //foreach (var latLong in latLongs)
+                            //{
+                            //    geoCoordinates.Add(new GeoCoordinate(Convert.ToDouble(latLong.Split(':')[0]),
+                            //        Convert.ToDouble(latLong.Split(':')[1])));
+                            //}
+
+                            //var centralCoordinates = GetCentralGeoCoordinate(geoCoordinates);
+
+                            //var parkingRegulations = nodeMasterRegulation.Where(x =>
+                            //        IsPointInPolygon4(new List<PointF>
+                            //            {
+                            //                new PointF(float.Parse(x.ParkingRegulation.Coodrinate1.Split(':')[0]),
+                            //                    float.Parse(x.ParkingRegulation.Coodrinate1.Split(':')[1]))
+                            //            }.ToArray(),
+                            //            new PointF(
+                            //                float.Parse(
+                            //                    centralCoordinates.Latitude.ToString(CultureInfo.InvariantCulture)),
+                            //                float.Parse(
+                            //                    centralCoordinates.Latitude.ToString(CultureInfo.InvariantCulture)))))
+                            //    .Select(x => x.ParkingRegulation).ToList();
+                            var parkingRegulations = new List<ParkingRegulation>();
+                            foreach (var regulation in nodeMasterRegulation)
+                            {
+                                var include = true;
+
+                                foreach (var latLong in latLongs)
+                                {
+                                    if (!IsPointInPolygon4(new List<PointF>
+                                        {
+                                            new PointF(
+                                                float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[0]),
+                                                float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[1]))
+                                        }.ToArray(),
+                                        new PointF(float.Parse(latLong.Split(':')[0]),
+                                            float.Parse(latLong.Split(':')[1]))))
+                                    {
+                                        include = false;
+                                    }
+                                    if (!include)
+                                        break;
+                                }
+
+                                if (include)
+                                    parkingRegulations.Add(regulation.ParkingRegulation);
+                            }
+                           
+
+                            foreach (var regulation in parkingRegulations)
                             {
                                 if (regulation.DayOfWeek.Split('|')
                                     .Contains(DateTime.Now.DayOfWeek.ToString().Substring(0, 3)))
@@ -195,6 +246,41 @@ namespace Predic.Pipeline.Service
                 j = i;
             }
             return result;
+        }
+
+        public static GeoCoordinate GetCentralGeoCoordinate(
+            IList<GeoCoordinate> geoCoordinates)
+        {
+            if (geoCoordinates.Count == 1)
+            {
+                return geoCoordinates.Single();
+            }
+
+            double x = 0;
+            double y = 0;
+            double z = 0;
+
+            foreach (var geoCoordinate in geoCoordinates)
+            {
+                var latitude = geoCoordinate.Latitude * Math.PI / 180;
+                var longitude = geoCoordinate.Longitude * Math.PI / 180;
+
+                x += Math.Cos(latitude) * Math.Cos(longitude);
+                y += Math.Cos(latitude) * Math.Sin(longitude);
+                z += Math.Sin(latitude);
+            }
+
+            var total = geoCoordinates.Count;
+
+            x = x / total;
+            y = y / total;
+            z = z / total;
+
+            var centralLongitude = Math.Atan2(y, x);
+            var centralSquareRoot = Math.Sqrt(x * x + y * y);
+            var centralLatitude = Math.Atan2(z, centralSquareRoot);
+
+            return new GeoCoordinate(centralLatitude * 180 / Math.PI, centralLongitude * 180 / Math.PI);
         }
     }
 }
