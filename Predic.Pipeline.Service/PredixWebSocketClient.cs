@@ -104,13 +104,12 @@ namespace Predic.Pipeline.Service
                     var storeForDurationCheck = false;
                     using (var context = new PredixContext())
                     {
-                        var nodeMasterRegulations = context.NodeMasterRegulations.Include(x => x.ParkingRegulation)
-                            .Include(x => x.NodeMaster).ToList();
+                        var nodeMasterRegulations = context.NodeMasterRegulations.Include(x => x.ParkingRegulation).ToList();
 
                         //check if GEO Coordinates match
 
                         var nodeMasterRegulation =
-                            nodeMasterRegulations.Where(x => x.NodeMaster.LocationUid == parkingEvent.LocationUid)
+                            nodeMasterRegulations.Where(x => x.LocationUid == parkingEvent.LocationUid)
                                 .ToList();
                         if (nodeMasterRegulation.Any())
                         {
@@ -177,7 +176,7 @@ namespace Predic.Pipeline.Service
 
                                             GeViolation geViolation = new GeViolation
                                             {
-                                                NodeId = nodeMasterRegulation.First().NodeMasterId,
+                                                //NodeId = nodeMasterRegulation.First().NodeMasterId,
                                                 ExceedParkingLimit =
                                                     regulation.ViolationType == ViolationType.ExceedParkingLimit,
                                                 NoParking = regulation.ViolationType == ViolationType.NoParking,

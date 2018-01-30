@@ -13,7 +13,7 @@ namespace Predic.Pipeline.DataService
         }
         public DbSet<Boundary> Boundaries { get; set; }
         public DbSet<GeViolation> GeViolations { get; set; }
-        public DbSet<NodeMaster> NodeMasters { get; set; }
+        //public DbSet<NodeMaster> NodeMasters { get; set; }
         public DbSet<NodeMasterRegulation> NodeMasterRegulations { get; set; }
         public DbSet<ParkingRegulation> ParkingRegulations { get; set; }
 
