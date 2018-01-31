@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9DB112B2-C435-43C2-9ADF-BD531236457C}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Predic.Pipeline.UI</RootNamespace>
-    <AssemblyName>Predic.Pipeline.UI</AssemblyName>
+    <RootNamespace>Predix.Pipeline.DataService</RootNamespace>
+    <AssemblyName>Predix.Pipeline.DataService</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,9 +32,11 @@
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -50,7 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="PredixContext.cs" />
+    <Compile Include="PredixContextInitializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -58,22 +58,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Predic.Pipeline.DataService\Predic.Pipeline.DataService.csproj">
-      <Project>{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}</Project>
-      <Name>Predic.Pipeline.DataService</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Predic.Pipeline.Helper\Predic.Pipeline.Helper.csproj">
-      <Project>{e4ea6006-fe75-4d07-a1d5-bf0cfcd46d3b}</Project>
-      <Name>Predic.Pipeline.Helper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Predic.Pipeline.Interface\Predic.Pipeline.Interface.csproj">
-      <Project>{F7631CDB-A84D-498C-87CE-30F414717AE5}</Project>
-      <Name>Predic.Pipeline.Interface</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Predic.Pipeline.Service\Predic.Pipeline.Service.csproj">
-      <Project>{83B637AC-D192-4FE4-8CE9-1A6B85D0C06C}</Project>
-      <Name>Predic.Pipeline.Service</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Predix.Domain.Model\Predix.Domain.Model.csproj">
       <Project>{7f72e9e0-463c-40c8-9b08-3596d91a432e}</Project>
       <Name>Predix.Domain.Model</Name>

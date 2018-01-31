@@ -5,13 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Predic.Pipeline.DataService;
-using Predic.Pipeline.Helper;
-using Predic.Pipeline.Interface;
 using Predix.Domain.Model.Constant;
 using Predix.Domain.Model.Location;
+using Predix.Pipeline.DataService;
+using Predix.Pipeline.Helper;
+using Predix.Pipeline.Interface;
 
-namespace Predic.Pipeline.Service
+namespace Predix.Pipeline.Service
 {
     public class ImageService : IImage
     {

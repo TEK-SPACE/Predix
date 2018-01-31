@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Predic.Pipeline.Helper
+namespace Predix.Pipeline.Helper
 {
     public static class Commentary
     {

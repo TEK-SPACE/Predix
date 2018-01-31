@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Migrations;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Predic.Pipeline.DataService;
-using Predic.Pipeline.Helper;
-using Predic.Pipeline.Interface;
+using Predix.Domain.Model;
 using Predix.Domain.Model.Constant;
 using Predix.Domain.Model.Location;
+using Predix.Pipeline.Helper;
+using Predix.Pipeline.Interface;
 
-namespace Predic.Pipeline.Service
+namespace Predix.Pipeline.Service
 {
     public class EventService : IEvent
     {
@@ -41,7 +39,7 @@ namespace Predic.Pipeline.Service
             }
             return details;
         }
-        public void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService, bool ignoreRegulationCheck)
+        public void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService, Options options)
         {
             //ParkingEvent parkingEvent = null;
             Dictionary<string, string> additionalHeaders =
@@ -50,7 +48,7 @@ namespace Predic.Pipeline.Service
             while (true)
             {
                 _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders,
-                    imageService, ignoreRegulationCheck).Wait();
+                    imageService, options).Wait();
             }
 
             //if (!string.IsNullOrWhiteSpace(response.Result))
@@ -62,14 +60,15 @@ namespace Predic.Pipeline.Service
             //}
             //await SaveAsync(parkingEvent);
             //return parkingEvent;
+            // ReSharper disable once FunctionNeverReturns
         }
-        public void GetByLocation(string locationUid, string eventType, IImage imageService)
+        public void GetByLocation(string locationUid, string eventType, IImage imageService,Options options)
         {
             ParkingEvent parkingEvent = null;
             Dictionary<string, string> additionalHeaders =
                 new Dictionary<string, string> { { "predix-zone-id", Endpoint.PredixZoneIdForParking } };
             string bodyMessage = $"{{\"locationUid\":\"{locationUid}\",\"eventTypes\":[\"{eventType}\"]}}";
-             _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders, imageService, false);
+             _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders, imageService, options);
             //if (!string.IsNullOrWhiteSpace(response.Result))
             //{
             //    var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);

@@ -4,10 +4,10 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Predic.Pipeline.Interface;
 using Predix.Domain.Model.Constant;
+using Predix.Pipeline.Interface;
 
-namespace Predic.Pipeline.Service
+namespace Predix.Pipeline.Service
 {
     public class SecurityService : ISecurity
     {

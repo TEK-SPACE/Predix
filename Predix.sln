@@ -1,21 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predix.Domain.Model", "Predix.Domain.Model\Predix.Domain.Model.csproj", "{7F72E9E0-463C-40C8-9B08-3596D91A432E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.UI", "Predic.Pipeline.UI\Predic.Pipeline.UI.csproj", "{9DB112B2-C435-43C2-9ADF-BD531236457C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predix.Pipeline.UI", "Predic.Pipeline.UI\Predix.Pipeline.UI.csproj", "{9DB112B2-C435-43C2-9ADF-BD531236457C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.Interface", "Predic.Pipeline.Interface\Predic.Pipeline.Interface.csproj", "{F7631CDB-A84D-498C-87CE-30F414717AE5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predix.Pipeline.Interface", "Predic.Pipeline.Interface\Predix.Pipeline.Interface.csproj", "{F7631CDB-A84D-498C-87CE-30F414717AE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.Service", "Predic.Pipeline.Service\Predic.Pipeline.Service.csproj", "{83B637AC-D192-4FE4-8CE9-1A6B85D0C06C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predix.Pipeline.Service", "Predic.Pipeline.Service\Predix.Pipeline.Service.csproj", "{83B637AC-D192-4FE4-8CE9-1A6B85D0C06C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.Test", "Predic.Pipeline.Test\Predic.Pipeline.Test.csproj", "{1BEC4EB3-4D42-4A34-890E-2A376D89C631}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predix.Pipeline.Test", "Predic.Pipeline.Test\Predix.Pipeline.Test.csproj", "{1BEC4EB3-4D42-4A34-890E-2A376D89C631}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.DataService", "Predic.Pipeline.DataService\Predic.Pipeline.DataService.csproj", "{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predix.Pipeline.DataService", "Predic.Pipeline.DataService\Predix.Pipeline.DataService.csproj", "{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predic.Pipeline.Helper", "Predic.Pipeline.Helper\Predic.Pipeline.Helper.csproj", "{E4EA6006-FE75-4D07-A1D5-BF0CFCD46D3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Predix.Pipeline.Helper", "Predic.Pipeline.Helper\Predix.Pipeline.Helper.csproj", "{E4EA6006-FE75-4D07-A1D5-BF0CFCD46D3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,5 +54,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E01CA5FA-687A-419B-8A2D-E07ACDD59F15}
 	EndGlobalSection
 EndGlobal

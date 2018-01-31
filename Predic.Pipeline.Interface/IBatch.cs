@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Predix.Domain.Model;
 using Predix.Domain.Model.Location;
 
-namespace Predic.Pipeline.Interface
+namespace Predix.Pipeline.Interface
 {
     public interface IBatch : ILocation
     {

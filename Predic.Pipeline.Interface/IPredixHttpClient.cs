@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Predic.Pipeline.Interface
+namespace Predix.Pipeline.Interface
 {
     public interface IPredixHttpClient
     {

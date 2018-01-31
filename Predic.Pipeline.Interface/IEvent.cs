@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Predix.Domain.Model;
 using Predix.Domain.Model.Location;
 
-namespace Predic.Pipeline.Interface
+namespace Predix.Pipeline.Interface
 {
     public interface  IEvent
     {
@@ -13,8 +13,9 @@ namespace Predic.Pipeline.Interface
         /// <param name="locationUid">The identifier assigned to this location<example>LOCATION-282</example></param>
         /// <param name="eventType">Filter for pedestrian events<example>["PKIN,PKOUT"]</example></param>
         /// <param name="imageService"></param>
+        /// <param name="options"></param>
         /// <returns></returns>
-        void GetByLocation(string locationUid, string eventType, IImage imageService);
+        void GetByLocation(string locationUid, string eventType, IImage imageService, Options options);
 
         /// <summary>
         /// 
@@ -23,8 +24,8 @@ namespace Predic.Pipeline.Interface
         /// <param name="eventType1"></param>
         /// <param name="eventType2"></param>
         /// <param name="imageService"></param>
-        /// <param name="ignoreRegulationCheck"></param>
-        void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService, bool ignoreRegulationCheck);
+        /// <param name="options"></param>
+        void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService, Options options);
 
         /// <summary>
         /// 

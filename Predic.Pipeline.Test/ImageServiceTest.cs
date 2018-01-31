@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using Predic.Pipeline.Interface;
-using Predic.Pipeline.Service;
+using Predix.Pipeline.Interface;
+using Predix.Pipeline.Service;
 
-namespace Predic.Pipeline.Test
+namespace Predix.Pipeline.Test
 {
     public class ImageServiceTest
     {

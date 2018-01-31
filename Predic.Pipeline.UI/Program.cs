@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Predic.Pipeline.Helper;
-using Predic.Pipeline.Interface;
-using Predic.Pipeline.Service;
-using Predic.Pipeline.DataService;
+using CommandLine;
 using Predix.Domain.Model;
+using Predix.Pipeline.DataService;
+using Predix.Pipeline.Helper;
+using Predix.Pipeline.Interface;
+using Predix.Pipeline.Service;
 
-namespace Predic.Pipeline.UI
+namespace Predix.Pipeline.UI
 {
     static class Program
     {
@@ -19,17 +20,35 @@ namespace Predic.Pipeline.UI
 
         static void Main(string[] args)
         {
+            Options options = new Options();
+            var result = Parser.Default.ParseArguments<Options>(args);
+            switch (result.Tag)
+            {
+                case ParserResultType.Parsed:
+                    var parsed = (Parsed<Options>) result;
+                    options = parsed.Value;
+                    Commentary.Print(
+                        $"Refresh Location = {options.RefreshLocations}, Ignore Regulation Check = {options.IgnoreRegulationCheck}, Save Events = {options.SaveEvents}");
+                    break;
+                case ParserResultType.NotParsed:
+                    var notParsed = (NotParsed<Options>) result;
+                    var errors = notParsed.Errors;
+                    foreach (var error in errors)
+                    {
+                        Commentary.Print($"{error}");
+                    }
+                    return;
+            }
+
             Init();
             var locationType = "PARKING_ZONE";
             int pagesize = 50;
-            var refreshNodeMaster = Convert.ToBoolean(args[0]);
-            var ignoreRegulationCheck = Convert.ToBoolean(args[1]);
             List<Boundary> boundaries = _locationService.GetBoundaries();
             foreach (var boundary in boundaries)
             {
                 Commentary.Print($"BBOX: {boundary.Range}");
                 Commentary.Print($"Location Type: {locationType}");
-                if (refreshNodeMaster)
+                if (options.RefreshLocations)
                 {
                     Commentary.Print($"Calling Get All Locations by BBOX & Location Type");
                     var locations = _locationService.All(boundary.Range, locationType, pagesize);
@@ -37,7 +56,7 @@ namespace Predic.Pipeline.UI
                     _locationService.Details(locations.Select(x => x.LocationUid).Distinct().ToList());
                 }
 
-                _eventService.GetByBoundary(boundary.Range, "PKIN", "PKOUT", _imageService, ignoreRegulationCheck);
+                _eventService.GetByBoundary(boundary.Range, "PKIN", "PKOUT", _imageService, options);
             }
 
             Commentary.Print($"Completed. Please enter a key to exit");

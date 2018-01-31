@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Predic.Pipeline.Helper;
-using Predic.Pipeline.Interface;
 using Predix.Domain.Model.Constant;
+using Predix.Pipeline.Helper;
+using Predix.Pipeline.Interface;
 
-namespace Predic.Pipeline.Service
+namespace Predix.Pipeline.Service
 {
     public class PredixHttpClient : IPredixHttpClient
     {

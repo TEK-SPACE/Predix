@@ -6,8 +6,8 @@
     <ProjectGuid>{1BEC4EB3-4D42-4A34-890E-2A376D89C631}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Predic.Pipeline.Test</RootNamespace>
-    <AssemblyName>Predic.Pipeline.Test</AssemblyName>
+    <RootNamespace>Predix.Pipeline.Test</RootNamespace>
+    <AssemblyName>Predix.Pipeline.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -69,13 +69,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Predic.Pipeline.Interface\Predic.Pipeline.Interface.csproj">
+    <ProjectReference Include="..\Predic.Pipeline.Interface\Predix.Pipeline.Interface.csproj">
       <Project>{f7631cdb-a84d-498c-87ce-30f414717ae5}</Project>
-      <Name>Predic.Pipeline.Interface</Name>
+      <Name>Predix.Pipeline.Interface</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Predic.Pipeline.Service\Predic.Pipeline.Service.csproj">
+    <ProjectReference Include="..\Predic.Pipeline.Service\Predix.Pipeline.Service.csproj">
       <Project>{83b637ac-d192-4fe4-8ce9-1a6b85d0c06c}</Project>
-      <Name>Predic.Pipeline.Service</Name>
+      <Name>Predix.Pipeline.Service</Name>
     </ProjectReference>
     <ProjectReference Include="..\Predix.Domain.Model\Predix.Domain.Model.csproj">
       <Project>{7f72e9e0-463c-40c8-9b08-3596d91a432e}</Project>

@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Device.Location;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
@@ -13,22 +12,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Predic.Pipeline.DataService;
-using Predic.Pipeline.Helper;
-using Predic.Pipeline.Interface;
 using Predix.Domain.Model;
 using Predix.Domain.Model.Constant;
 using Predix.Domain.Model.Enum;
 using Predix.Domain.Model.Location;
+using Predix.Pipeline.DataService;
+using Predix.Pipeline.Helper;
+using Predix.Pipeline.Interface;
 
-namespace Predic.Pipeline.Service
+namespace Predix.Pipeline.Service
 {
     public class PredixWebSocketClient : IPredixWebSocketClient
     {
         private readonly ISecurity _securityService = new SecurityService();
 
         public async Task OpenAsync(string url, string bodyMessage,
-            Dictionary<string, string> additionalHeaders, IImage imageService, bool ignoreRegulationCheck)
+            Dictionary<string, string> additionalHeaders, IImage imageService, Options options)
         {
             _securityService.SetClientToken().Wait();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
@@ -92,7 +91,7 @@ namespace Predic.Pipeline.Service
                         ? (jsonRespone).ToObject<ParkingEvent>()
                         : new ParkingEvent();
                     Commentary.Print($"Location ID :{parkingEvent.LocationUid}");
-                    if (ignoreRegulationCheck)
+                    if (options.IgnoreRegulationCheck)
                     {
                         Commentary.Print($"Skipping Regulation Check Alg", true);
                         Save(parkingEvent);
@@ -104,7 +103,8 @@ namespace Predic.Pipeline.Service
                     var storeForDurationCheck = false;
                     using (var context = new PredixContext())
                     {
-                        var nodeMasterRegulations = context.NodeMasterRegulations.Include(x => x.ParkingRegulation).ToList();
+                        var nodeMasterRegulations =
+                            context.NodeMasterRegulations.Include(x => x.ParkingRegulation).ToList();
 
                         //check if GEO Coordinates match
 
@@ -153,6 +153,7 @@ namespace Predic.Pipeline.Service
                                     {
                                         include = false;
                                     }
+
                                     if (!include)
                                         break;
                                 }
@@ -160,7 +161,7 @@ namespace Predic.Pipeline.Service
                                 if (include)
                                     parkingRegulations.Add(regulation.ParkingRegulation);
                             }
-                           
+
 
                             foreach (var regulation in parkingRegulations)
                             {
@@ -204,7 +205,7 @@ namespace Predic.Pipeline.Service
                         }
                     }
 
-                    if (!isVoilation && !storeForDurationCheck) continue;
+                    if (!isVoilation && !storeForDurationCheck && !options.SaveEvents) continue;
                     Save(parkingEvent);
                     imageService.MediaOnDemand(parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
                 }

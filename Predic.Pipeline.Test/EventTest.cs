@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Predic.Pipeline.Interface;
-using Predic.Pipeline.Service;
+using Predix.Domain.Model;
 using Predix.Domain.Model.Location;
+using Predix.Pipeline.Interface;
+using Predix.Pipeline.Service;
 
-namespace Predic.Pipeline.Test
+namespace Predix.Pipeline.Test
 {
     class EventTest
     {
@@ -20,7 +21,7 @@ namespace Predic.Pipeline.Test
         [TestCase("LOCATION-225", "PKIN")]
         public void GetWebSocketTest(string locationUid, string eventType)
         {
-            _eventService.GetByLocation(locationUid, eventType,new ImageService(new Dictionary<string, object>()));
+            _eventService.GetByLocation(locationUid, eventType,new ImageService(new Dictionary<string, object>()),new Options());
             //Assert.IsNotNull(details);
             //Assert.AreSame(new ParkingEvent(), details);
         }

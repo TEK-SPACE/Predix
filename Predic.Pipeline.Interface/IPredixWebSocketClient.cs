@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Predix.Domain.Model;
 
-namespace Predic.Pipeline.Interface
+namespace Predix.Pipeline.Interface
 {
     public interface IPredixWebSocketClient
     {
         Task OpenAsync(string url, string bodyMessage, Dictionary<string, string> additionalHeaders,
-            IImage imageService, bool ignoreRegulationCheck);
+            IImage imageService, Options options);
     }
 }

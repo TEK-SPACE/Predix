@@ -4,13 +4,13 @@ using System.Data.Entity.Migrations;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Predic.Pipeline.DataService;
-using Predic.Pipeline.Interface;
 using Predix.Domain.Model;
 using Predix.Domain.Model.Constant;
 using Predix.Domain.Model.Location;
+using Predix.Pipeline.DataService;
+using Predix.Pipeline.Interface;
 
-namespace Predic.Pipeline.Service
+namespace Predix.Pipeline.Service
 {
     public class LocationService : ILocation
     {

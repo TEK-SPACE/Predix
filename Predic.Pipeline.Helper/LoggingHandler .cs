@@ -2,11 +2,11 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Predic.Pipeline.DataService;
 using Predix.Domain.Model;
 using Predix.Domain.Model.Enum;
+using Predix.Pipeline.DataService;
 
-namespace Predic.Pipeline.Helper
+namespace Predix.Pipeline.Helper
 {
     public class LoggingHandler : DelegatingHandler
     {

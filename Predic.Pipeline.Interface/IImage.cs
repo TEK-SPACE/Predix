@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-using Predix.Domain.Model.Location;
-
-namespace Predic.Pipeline.Interface
+﻿namespace Predix.Pipeline.Interface
 {
     public interface IImage
     {

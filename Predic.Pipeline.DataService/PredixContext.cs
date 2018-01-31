@@ -2,7 +2,7 @@
 using Predix.Domain.Model;
 using Predix.Domain.Model.Location;
 
-namespace Predic.Pipeline.DataService
+namespace Predix.Pipeline.DataService
 {
     public class PredixContext : DbContext
     {

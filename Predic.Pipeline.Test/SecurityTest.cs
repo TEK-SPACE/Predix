@@ -1,12 +1,9 @@
-﻿using System;
-using System.Configuration;
-using System.Text;
-using NUnit.Framework;
-using Predic.Pipeline.Interface;
-using Predic.Pipeline.Service;
+﻿using NUnit.Framework;
 using Predix.Domain.Model.Constant;
+using Predix.Pipeline.Interface;
+using Predix.Pipeline.Service;
 
-namespace Predic.Pipeline.Test
+namespace Predix.Pipeline.Test
 {
     [TestFixture]
     public class SecurityTest

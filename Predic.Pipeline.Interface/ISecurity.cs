@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Predic.Pipeline.Interface
+namespace Predix.Pipeline.Interface
 {
     public interface ISecurity
     {
