@@ -69,17 +69,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Predic.Pipeline.Interface\Predix.Pipeline.Interface.csproj">
-      <Project>{f7631cdb-a84d-498c-87ce-30f414717ae5}</Project>
-      <Name>Predix.Pipeline.Interface</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Predic.Pipeline.Service\Predix.Pipeline.Service.csproj">
-      <Project>{83b637ac-d192-4fe4-8ce9-1a6b85d0c06c}</Project>
-      <Name>Predix.Pipeline.Service</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Predix.Domain.Model\Predix.Domain.Model.csproj">
       <Project>{7f72e9e0-463c-40c8-9b08-3596d91a432e}</Project>
       <Name>Predix.Domain.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Predix.Pipeline.Interface\Predix.Pipeline.Interface.csproj">
+      <Project>{f7631cdb-a84d-498c-87ce-30f414717ae5}</Project>
+      <Name>Predix.Pipeline.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Predix.Pipeline.Service\Predix.Pipeline.Service.csproj">
+      <Project>{83b637ac-d192-4fe4-8ce9-1a6b85d0c06c}</Project>
+      <Name>Predix.Pipeline.Service</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
