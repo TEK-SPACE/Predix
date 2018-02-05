@@ -34,14 +34,16 @@ namespace Predix.Domain.Model.Location
         /// </summary>
         [JsonProperty(PropertyName = "timestamp")]
         public string Timestamp { get; set; }
-
-        [JsonProperty(PropertyName = "properties")]
-        public ParkingEventProperties Properties { get; set; }
-
-        [JsonProperty(PropertyName = "measures")]
-        public Measures Measures { get; set; }
         [JsonIgnore]
-        public int? ActivityId { get; set; }
+        public int? PropertyId { get; set; }
+        [JsonProperty(PropertyName = "properties"), ForeignKey("PropertyId")]
+        public virtual ParkingEventProperties Properties { get; set; }
+
+        public int? MeasureId { get; set; }
+        [JsonProperty(PropertyName = "measures"), ForeignKey("MeasureId")]
+        public Measures Measures { get; set; }
+        //[JsonIgnore]
+        //public int? ActivityId { get; set; }
         //[JsonIgnore]
         //[ForeignKey("ActivityId")]
         //public Activity Activity { get; set; }
@@ -54,6 +56,8 @@ namespace Predix.Domain.Model.Location
         //public virtual Image Image { get; set; }
         [JsonIgnore]
         public bool DurationCheck { get; set; }
-        public virtual List<ParkingEventProperties> Propertieses { get; set; }
+        //public virtual List<ParkingEventProperties> Propertieses { get; set; }
+        [JsonIgnore]
+        public double MatchRate { get; set; }
     }
 }

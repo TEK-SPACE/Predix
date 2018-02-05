@@ -17,6 +17,10 @@ namespace Predix.Domain.Model
             HelpText = "Save Events.")]
         public bool SaveEvents { get; set; }
 
+        [Option('i', "img", //Required = true,
+            HelpText = "Save Images.")]
+        public bool SaveImages { get; set; }
+
         //[Option('v', "verbose", DefaultValue = true,
         //     HelpText = "Prints all messages to standard output.")]
         //public bool Verbose { get; set; }

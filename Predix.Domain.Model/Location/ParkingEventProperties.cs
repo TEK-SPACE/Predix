@@ -15,11 +15,11 @@ namespace Predix.Domain.Model.Location
         /// </summary>
         [JsonProperty(PropertyName = "pixelCoordinates")]
         public string PixelCoordinates { get; set; }
-        /// <summary>
-        /// The unique identifier assigned to a specific parking event.
-        /// </summary>
-        [JsonProperty(PropertyName = "eventUid")]
-        public string EventUid { get; set; }
+        ///// <summary>
+        ///// The unique identifier assigned to a specific parking event.
+        ///// </summary>
+        //[JsonProperty(PropertyName = "eventUid")]
+        //public string EventUid { get; set; }
         /// <summary>
         /// The unique identifier of a specific vehicle.
         /// </summary>
@@ -36,18 +36,18 @@ namespace Predix.Domain.Model.Location
         [JsonProperty(PropertyName = "imageAssetUid")]
         public string ImageAssetUid { get; set; }
 
-        [JsonIgnore]
-        public int? ActivityId { get; set; }
+        //[JsonIgnore]
+        //public int? ActivityId { get; set; }
 
-        [JsonIgnore]
-        [ForeignKey("ActivityId")]
-        public Activity Activity { get; set; }
+        //[JsonIgnore]
+        //[ForeignKey("ActivityId")]
+        //public Activity Activity { get; set; }
 
         [JsonIgnore]
         public string LocationUid { get; set; }
 
-        [JsonIgnore]
-        public int ParkingEventId { get; set; }
+        //[JsonIgnore]
+        //public int ParkingEventId { get; set; }
 
         //[JsonIgnore]
         //[ForeignKey("ParkingEventId")]

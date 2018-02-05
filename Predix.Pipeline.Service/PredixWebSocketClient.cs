@@ -99,6 +99,10 @@ namespace Predix.Pipeline.Service
                         continue;
                     }
 
+                    parkingEvent.Properties.LocationUid = parkingEvent.LocationUid;
+                    //parkingEvent.Properties.EventUid = parkingEvent.Id
+                    //parkingEvent.Properties.ParkingEventId = parkingEvent.Id;
+
                     var isVoilation = false;
                     var storeForDurationCheck = false;
                     using (var context = new PredixContext())
@@ -138,27 +142,37 @@ namespace Predix.Pipeline.Service
                             var parkingRegulations = new List<ParkingRegulation>();
                             foreach (var regulation in nodeMasterRegulation)
                             {
-                                var include = true;
+                                //var include = false;
 
                                 foreach (var latLong in latLongs)
                                 {
-                                    if (!IsPointInPolygon4(new List<PointF>
+                                    if (IsPointInPolygon4(new List<PointF>
                                         {
                                             new PointF(
                                                 float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[0]),
-                                                float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[1]))
+                                                float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[1])),
+                                            new PointF(
+                                                float.Parse(regulation.ParkingRegulation.Coodrinate2.Split(':')[0]),
+                                                float.Parse(regulation.ParkingRegulation.Coodrinate2.Split(':')[1])),
+                                            new PointF(
+                                                float.Parse(regulation.ParkingRegulation.Coodrinate3.Split(':')[0]),
+                                                float.Parse(regulation.ParkingRegulation.Coodrinate3.Split(':')[1])),
+                                            new PointF(
+                                                float.Parse(regulation.ParkingRegulation.Coodrinate4.Split(':')[0]),
+                                                float.Parse(regulation.ParkingRegulation.Coodrinate4.Split(':')[1]))
                                         }.ToArray(),
                                         new PointF(float.Parse(latLong.Split(':')[0]),
                                             float.Parse(latLong.Split(':')[1]))))
                                     {
-                                        include = false;
+                                        //include = true;
+                                        parkingEvent.MatchRate += 25;
                                     }
 
-                                    if (!include)
-                                        break;
+                                    //if (include)
+                                    //    break;
                                 }
 
-                                if (include)
+                                if (parkingEvent.MatchRate > 0)
                                     parkingRegulations.Add(regulation.ParkingRegulation);
                             }
 
@@ -207,7 +221,8 @@ namespace Predix.Pipeline.Service
 
                     if (!isVoilation && !storeForDurationCheck && !options.SaveEvents) continue;
                     Save(parkingEvent);
-                    imageService.MediaOnDemand(parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
+                    if(isVoilation || options.SaveImages)
+                        imageService.MediaOnDemand(parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
                 }
 
                 Commentary.Print($"WebSocket State:{clientWebSocket.State}");
@@ -221,7 +236,8 @@ namespace Predix.Pipeline.Service
             using (PredixContext context = new PredixContext())
             {
                 Commentary.Print($"Saving Event Data", true);
-                context.ParkingEvents.AddOrUpdate(x => new { x.LocationUid, x.EventType }, parkingEvent);
+                context.ParkingEvents.Add(parkingEvent);
+                //context.ParkingEvents.AddOrUpdate(x => new { x.LocationUid, x.EventType }, parkingEvent);
                 context.SaveChanges();
             }
         }

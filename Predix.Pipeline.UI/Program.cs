@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using CommandLine;
 using Predix.Domain.Model;
 using Predix.Pipeline.DataService;
@@ -17,7 +19,6 @@ namespace Predix.Pipeline.UI
         private static IEvent _eventService;
         private static IImage _imageService;
         private static readonly Dictionary<string, object> GlobalVariables = new Dictionary<string, object>();
-
         static void Main(string[] args)
         {
             Options options = new Options();
@@ -28,7 +29,7 @@ namespace Predix.Pipeline.UI
                     var parsed = (Parsed<Options>) result;
                     options = parsed.Value;
                     Commentary.Print(
-                        $"Refresh Location = {options.RefreshLocations}, Ignore Regulation Check = {options.IgnoreRegulationCheck}, Save Events = {options.SaveEvents}");
+                        $"\nRefresh Location = {options.RefreshLocations}\nIgnore Regulation Check = {options.IgnoreRegulationCheck}\nSave Events = {options.SaveEvents}\nSave Images= {options.SaveImages}");
                     break;
                 case ParserResultType.NotParsed:
                     var notParsed = (NotParsed<Options>) result;

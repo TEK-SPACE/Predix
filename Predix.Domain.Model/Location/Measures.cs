@@ -10,12 +10,12 @@ namespace Predix.Domain.Model.Location
         [JsonIgnore]
         [Key]
         public int Id { get; set; }
-        [JsonIgnore]
-        public int? ActivityId { get; set; }
+        //[JsonIgnore]
+        //public int? ActivityId { get; set; }
 
-        [JsonIgnore]
-        [ForeignKey("ActivityId")]
-        public virtual Activity Activity { get; set; }
+        //[JsonIgnore]
+        //[ForeignKey("ActivityId")]
+        //public virtual Activity Activity { get; set; }
         [JsonIgnore]
         public int LocationUid { get; set; }
 

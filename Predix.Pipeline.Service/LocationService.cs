@@ -60,7 +60,7 @@ namespace Predix.Pipeline.Service
                 var response = _predixHttpClient.GetAllAsync(Endpoint.GetLocationDetails
                     .Replace("{locationUid}", locationUid), additionalHeaders);
                 if (string.IsNullOrWhiteSpace(response.Result))
-                    return null;
+                    continue;
 
                 var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
                 var locationDetails = (jsonRespone).ToObject<LocationDetails>();
