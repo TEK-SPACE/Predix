@@ -3,7 +3,9 @@
     public enum ViolationType
     {
         NoParking = 1,
-        ExceedParkingLimit = 2,
-        StreetSweeping = 3
+        TimeLimitParking = 2,
+        StreetSweeping = 3,
+        ReservedParking = 4,
+        FireHydrant = 5
     }
 }

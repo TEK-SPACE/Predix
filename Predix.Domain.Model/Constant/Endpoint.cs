@@ -25,7 +25,7 @@ namespace Predix.Domain.Model.Constant
             $"{MetaDataUrl}/v2/metadata/locations/search?q=locationType:{{locationType}}&bbox={{bbox}}&page={{pageNumber}}&size={{pageSize}}";
 
         public static readonly string GetLocationDetails =
-            $"{MetaDataUrl}/locations/{{locationUid}}";
+            $"{MetaDataUrl}/v2/metadata/locations/{{locationUid}}";
 
         public static readonly string MediaOnDemand = $"{MediaUrl}/ondemand/assets/{{ps_asset}}/media?mediaType=IMAGE&timestamp={{timestamp}}&page=0&size=100&sortBy=mediaLogId&sortDir=DESC";
     }

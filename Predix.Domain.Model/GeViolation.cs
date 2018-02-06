@@ -1,10 +1,16 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Predix.Domain.Model
 {
     public class GeViolation
     {
+        /// <summary>
+        /// Vehicle Id
+        /// </summary>
+        public string ObjectUid;
+
         /// <summary>
         /// Unique ID
         /// </summary>
@@ -13,7 +19,10 @@ namespace Predix.Domain.Model
         /// <summary>
         /// Location or Node ID
         /// </summary>
-        public int NodeId { get; set; }
+        [StringLength(250)]
+        public string LocationUid { get; set; }
+        [ForeignKey("LocationUid")]
+        public Location.Location Location { get; set; }
         /// <summary>
         /// Is a No Parking Vioaltion
         /// </summary>

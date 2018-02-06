@@ -31,8 +31,9 @@ namespace Predix.Domain.Model.Location
         public string Timezone { get; set; }
         [JsonProperty("address")]
         public string Address { get; set; }
+
         [JsonProperty("properties")]
-        public LocationDetailProperties Properties { get; set; }
+        public LocationDetailProperties Properties { get; set; } = new LocationDetailProperties();
         [JsonProperty("analyticCategory")]
         public LocalDetailAnalyticCategory AnalyticCategory { get; set; }
     }

@@ -54,6 +54,7 @@ namespace Predix.Pipeline.UI
                     Commentary.Print($"Calling Get All Locations by BBOX & Location Type");
                     var locations = _locationService.All(boundary.Range, locationType, pagesize);
                     Commentary.Print($"Total Locations: {locations.Count}");
+
                     _locationService.Details(locations.Select(x => x.LocationUid).Distinct().ToList());
                 }
 
