@@ -1,21 +1,22 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Predix.Domain.Model.Enum;
 
 namespace Predix.Domain.Model
 {
     public class GeViolation
     {
-        /// <summary>
-        /// Vehicle Id
-        /// </summary>
-        public string ObjectUid;
 
         /// <summary>
         /// Unique ID
         /// </summary>
         [Key]
         public int Id { get; set; }
+        /// <summary>
+        /// Vehicle Id
+        /// </summary>
+        public string ObjectUid { get; set; }
         /// <summary>
         /// Location or Node ID
         /// </summary>
@@ -47,5 +48,18 @@ namespace Predix.Domain.Model
         /// Duration in Minutes
         /// </summary>
         public long ViolationDuration { get; set; }
+        /// <summary>
+        /// Haris needs its for PEMS side
+        /// </summary>
+        public bool IsException { get; set; }
+        /// <summary>
+        /// Haris needs its for PEMS side
+        /// </summary>
+        public bool IsViolated { get; set; }
+
+        public int RegulationId { get; set; }
+        public ViolationType ViolationType { get; set; }
+        public DateTime? EventInDateTime { get; set; }
+        public DateTime? EventOutDateTime { get; set; }
     }
 }

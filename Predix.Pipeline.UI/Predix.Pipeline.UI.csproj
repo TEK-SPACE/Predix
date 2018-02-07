@@ -95,7 +95,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Predix.Pipeline.UI_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Predix.Pipeline.DataService\Predix.Pipeline.DataService.csproj">

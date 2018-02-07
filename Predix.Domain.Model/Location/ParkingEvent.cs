@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -34,6 +35,18 @@ namespace Predix.Domain.Model.Location
         /// </summary>
         [JsonProperty(PropertyName = "timestamp")]
         public string Timestamp { get; set; }
+        [JsonIgnore]
+        public DateTime? EventTime
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(Timestamp))
+                    return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Convert.ToInt64(Timestamp));
+                return null;
+            }
+            set {  }
+         }
+
         [JsonIgnore]
         public int? PropertyId { get; set; }
         [JsonProperty(PropertyName = "properties"), ForeignKey("PropertyId")]
