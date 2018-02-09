@@ -56,5 +56,10 @@ namespace Predix.Domain.Model.Location
         //[JsonIgnore]
         //[ForeignKey("ImageAssetUid")]
         //public Image Image { get; set; }
+        //[JsonIgnore]
+        //public int? ImageId { get; set; }
+        //[JsonIgnore]
+        //[ForeignKey("ImageId")]
+        //public Image Image { get; set; }
     }
 }

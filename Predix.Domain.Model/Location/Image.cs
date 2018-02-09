@@ -7,8 +7,10 @@ namespace Predix.Domain.Model.Location
     [Table("Images", Schema = "dbo")]
     public class Image : CommonEntity
     {
+        [Key]
+        public int Id { get; set; }
         [JsonIgnore]
-        [Key][StringLength(255)]
+        [StringLength(255)]
         public string ImageAssetUid { get; set; }
 
         [JsonProperty("last")]
@@ -26,7 +28,11 @@ namespace Predix.Domain.Model.Location
         [JsonProperty("number")]
         public int Number { get; set; }
         public string Status { get; set; }
-        [JsonProperty("listOfEntries")] [NotMapped]
+        [JsonIgnore]
+        public int? EntryId { get; set; }
+        [JsonProperty("listOfEntries")]
+        //[NotMapped]
+        [ForeignKey("EntryId")]
         public Entries Entry { get; set; }
         [JsonIgnore]
         public int? ActivityId { get; set; }
@@ -35,17 +41,40 @@ namespace Predix.Domain.Model.Location
         public virtual Activity Activity { get; set; }
         [JsonIgnore]
         public string Base64 { get; set; }
-    }
 
+        //[ForeignKey("EntryId")]
+        //[JsonIgnore]
+        //public Entries Entries { get; set; }
+        [JsonIgnore]
+        public int PropertyId { get; set; }
+        [JsonProperty(PropertyName = "properties"), ForeignKey("PropertyId")]
+        public virtual ParkingEventProperties Properties { get; set; }
+        public int? MediaId { get; set; }
+        [ForeignKey("MediaId")]
+        [JsonIgnore]
+        public Media Media { get; set; }
+    }
+    [Table("ImageEntries", Schema = "dbo")]
     public class Entries
     {
+        [Key]
+        [JsonIgnore]
+        public int Id { get; set; }
+
         [JsonProperty("content")]
-        public Content[] Contents { get; set; }
+        public virtual Content[] Contents { get; set; }
     }
 
     [Table("ImageContents", Schema = "dbo")]
     public class Content
     {
+        [Key]
+        [JsonIgnore]
+        public int Id { get; set; }
+        public int ImageId { get; set; }
+        [ForeignKey("ImageId")]
+        [JsonIgnore]
+        public Image Image { get; set; }
         [JsonProperty("mediaType")]
         public string MediaType { get; set; }
         [JsonProperty("mediaFileName")]
@@ -53,7 +82,7 @@ namespace Predix.Domain.Model.Location
         [JsonProperty("mediaTimestamp")]
         public string MediaTimestap { get; set; }
         [JsonProperty("assetUid")]
-        [Key]
+        //[Key]
         [StringLength(255)]
         public string AssetUid { get; set; }
         [JsonProperty("status")]

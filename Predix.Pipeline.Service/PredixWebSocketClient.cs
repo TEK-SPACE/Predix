@@ -96,7 +96,7 @@ namespace Predix.Pipeline.Service
                     {
                         Commentary.Print($"Skipping Regulation Check Alg", true);
                         Save(parkingEvent);
-                        imageService.MediaOnDemand(parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
+                        imageService.MediaOnDemand(parkingEvent.Properties.Id, parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
                         continue;
                     }
 
@@ -105,7 +105,6 @@ namespace Predix.Pipeline.Service
                     //parkingEvent.Properties.ParkingEventId = parkingEvent.Id;
 
                     var isVoilation = false;
-                    var storeForDurationCheck = false;
                     using (var context = new PredixContext())
                     {
                         var nodeMasterRegulations =
@@ -176,7 +175,6 @@ namespace Predix.Pipeline.Service
                                 if (parkingEvent.MatchRate > 0)
                                     parkingRegulations.Add(regulation.ParkingRegulation);
                             }
-
 
                             foreach (var regulation in parkingRegulations)
                             {
@@ -387,7 +385,7 @@ namespace Predix.Pipeline.Service
                     if (!isVoilation && !options.SaveEvents) continue;
                     Save(parkingEvent);
                     if (isVoilation || options.SaveImages)
-                        imageService.MediaOnDemand(parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
+                        imageService.MediaOnDemand(parkingEvent.Properties.Id, parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
                 }
                 Commentary.Print($"WebSocket State:{clientWebSocket.State}");
             }

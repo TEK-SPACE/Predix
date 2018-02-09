@@ -5,8 +5,10 @@ namespace Predix.Domain.Model.Location
 {
    public  class Media
    {
-       [JsonIgnore]
-       [Key]
+        [JsonIgnore]
+        [Key]
+        public int Id { get; set; }
+        [JsonIgnore]
        [StringLength(250)]
        public string ImageAssetUid { get; set; }
         [JsonProperty("pollUrl")]

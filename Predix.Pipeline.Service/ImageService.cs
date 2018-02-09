@@ -23,10 +23,10 @@ namespace Predix.Pipeline.Service
             _globalVariables = globalVariables;
         }
 
-        public void MediaOnDemand(string imageAssetUid, string timestamp)
+        public void MediaOnDemand(int propertyId, string imageAssetUid, string timestamp)
         {
             var media = GetMedia(imageAssetUid, timestamp);
-            Image image = new Image();
+            Image image = new Image { PropertyId = propertyId};
             var i = 1;
             while (i < 5 && (image?.Entry == null || !image.Entry.Contents.Any(x => x.Status.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))))
             {
@@ -38,10 +38,19 @@ namespace Predix.Pipeline.Service
                     var response = _predixHttpClient.GetAllAsync(media.PollUrl, additionalHeaders);
                     if (!string.IsNullOrWhiteSpace(response.Result))
                     {
-                        var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
-                        image = jsonRespone != null
-                            ? (jsonRespone).ToObject<Image>()
-                            : new Image();
+                        try
+                        {
+                            var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
+                            image = jsonRespone != null
+                                ? (jsonRespone).ToObject<Image>()
+                                : new Image();
+                        }
+                        catch (Exception e)
+                        {
+                            Commentary.Print(e.Message);
+                            Commentary.Print(response.Result);
+                        }
+                       
                     }
                 }
                 if (image?.Entry == null ||
@@ -59,6 +68,7 @@ namespace Predix.Pipeline.Service
                 image.Base64 = imageBinary;
             }
             if (image == null) return;
+            image.PropertyId = propertyId;
             image.ImageAssetUid = imageAssetUid;
             Save(image);
             //return image.Base64;
@@ -100,7 +110,8 @@ namespace Predix.Pipeline.Service
             using (PredixContext context = new PredixContext())
             {
                 Commentary.Print($"Saving Media Data", true);
-                context.Medias.AddOrUpdate(x => x.ImageAssetUid, media);
+                context.Medias.Add(media);
+                //context.Medias.AddOrUpdate(x => x.ImageAssetUid, media);
                 context.SaveChanges();
             }
         }
@@ -112,7 +123,9 @@ namespace Predix.Pipeline.Service
             using (PredixContext context = new PredixContext())
             {
                 Commentary.Print($"Saving Base64", true);
-                context.Images.AddOrUpdate(x => x.ImageAssetUid, image);
+                context.ImageContents.AddRange(image.Entry.Contents);
+                context.Images.Add(image);
+                //context.Images.AddOrUpdate(x => x.ImageAssetUid, image);
                 context.SaveChanges();
             }
         }
