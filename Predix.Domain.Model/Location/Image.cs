@@ -41,6 +41,8 @@ namespace Predix.Domain.Model.Location
         public virtual Activity Activity { get; set; }
         [JsonIgnore]
         public string Base64 { get; set; }
+        [JsonIgnore]
+        public string OriginalBase64 { get; set; }
 
         //[ForeignKey("EntryId")]
         //[JsonIgnore]

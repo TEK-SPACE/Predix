@@ -20,6 +20,9 @@ namespace Predix.Domain.Model
         [Option('m', "img", //Required = true,
             HelpText = "Save Images.")]
         public bool SaveImages { get; set; }
+        [Option('a', "all", //Required = true,
+            HelpText = "Mark All as Violations")]
+        public bool MarkAllAsViolations { get; set; }
 
         //[Option('v', "verbose", DefaultValue = true,
         //     HelpText = "Prints all messages to standard output.")]

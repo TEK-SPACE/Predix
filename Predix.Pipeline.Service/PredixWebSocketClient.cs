@@ -96,7 +96,7 @@ namespace Predix.Pipeline.Service
                     {
                         Commentary.Print($"Skipping Regulation Check Alg", true);
                         Save(parkingEvent);
-                        imageService.MediaOnDemand(parkingEvent.Properties.Id, parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
+                        imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
                         continue;
                     }
 
@@ -115,7 +115,56 @@ namespace Predix.Pipeline.Service
                         var nodeMasterRegulation =
                             nodeMasterRegulations.Where(x => x.LocationUid == parkingEvent.LocationUid)
                                 .ToList();
-                        if (nodeMasterRegulation.Any())
+                        if (options.MarkAllAsViolations)
+                        {
+                            #region Temp Push all as violoations
+
+                            if (parkingEvent.EventType.Equals("PKOUT"))
+                            {
+                                using (var innerContext = new PredixContext())
+                                {
+                                    var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
+                                        x.ObjectUid == parkingEvent.Properties.ObjectUid &&
+                                        x.LocationUid == parkingEvent.LocationUid);
+                                    if (inEvent?.ParkinTime != null)
+                                    {
+                                        inEvent.ExceedParkingLimit = true;
+                                        inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
+                                        inEvent.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                                        inEvent.ViolationDuration = DateTime.Now.TimeOfDay
+                                            .Subtract(inEvent.ParkinTime.Value).Minutes;
+                                        inEvent.ExceedParkingLimit = true;
+                                        innerContext.SaveChanges();
+                                        break;
+                                    }
+                                }
+                            }
+
+                            GeViolation geViolation = new GeViolation
+                            {
+                                NoParking = true,
+                                ObjectUid = parkingEvent.Properties.ObjectUid,
+                                LocationUid = parkingEvent.LocationUid
+                            };
+                            if (parkingEvent.EventType.Equals("PKIN"))
+                            {
+                                geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                                geViolation.ParkinTime = DateTime.Now.TimeOfDay;
+                            }
+
+                            if (parkingEvent.EventType.Equals("PKOUT"))
+                            {
+                                geViolation.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                                geViolation.ParkoutTime = DateTime.Now.TimeOfDay;
+                            }
+                            geViolation.RegulationId = 81;
+                            geViolation.ViolationType = ViolationType.FireHydrant;
+
+                            context.GeViolations.Add(geViolation);
+
+                            #endregion
+                        }
+                        else if (nodeMasterRegulation.Any())
                         {
                             var latLongs = parkingEvent.Properties.GeoCoordinates.Split(',').ToList();
                             //var geoCoordinates = new List<GeoCoordinate>();
@@ -379,13 +428,14 @@ namespace Predix.Pipeline.Service
                                     break;
                             }
                         }
+
                         context.SaveChanges();
                     }
 
                     if (!isVoilation && !options.SaveEvents) continue;
                     Save(parkingEvent);
                     if (isVoilation || options.SaveImages)
-                        imageService.MediaOnDemand(parkingEvent.Properties.Id, parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
+                        imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
                 }
                 Commentary.Print($"WebSocket State:{clientWebSocket.State}");
             }

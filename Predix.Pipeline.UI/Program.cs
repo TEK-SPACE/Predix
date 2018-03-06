@@ -26,7 +26,7 @@ namespace Predix.Pipeline.UI
                     var parsed = (Parsed<Options>) result;
                     options = parsed.Value;
                     Commentary.Print(
-                        $"\nRefresh Location = {options.RefreshLocations}\nIgnore Regulation Check = {options.IgnoreRegulationCheck}\nSave Events = {options.SaveEvents}\nSave Images= {options.SaveImages}");
+                        $"\nRefresh Location = {options.RefreshLocations}\nIgnore Regulation Check = {options.IgnoreRegulationCheck}\nSave Events = {options.SaveEvents}\nSave Images= {options.SaveImages}\nMark All As Violations= {options.MarkAllAsViolations}");
                     break;
                 case ParserResultType.NotParsed:
                     var notParsed = (NotParsed<Options>) result;

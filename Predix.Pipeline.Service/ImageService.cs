@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -10,6 +12,7 @@ using Predix.Domain.Model.Location;
 using Predix.Pipeline.DataService;
 using Predix.Pipeline.Helper;
 using Predix.Pipeline.Interface;
+using Image = Predix.Domain.Model.Location.Image;
 
 namespace Predix.Pipeline.Service
 {
@@ -23,10 +26,10 @@ namespace Predix.Pipeline.Service
             _globalVariables = globalVariables;
         }
 
-        public void MediaOnDemand(int propertyId, string imageAssetUid, string timestamp)
+        public void MediaOnDemand(ParkingEvent parkingEvent, string imageAssetUid, string timestamp)
         {
             var media = GetMedia(imageAssetUid, timestamp);
-            Image image = new Image { PropertyId = propertyId};
+            Image image = new Image { PropertyId = parkingEvent.Properties.Id };
             var i = 1;
             while (i < 5 && (image?.Entry == null || !image.Entry.Contents.Any(x => x.Status.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))))
             {
@@ -66,12 +69,59 @@ namespace Predix.Pipeline.Service
                     into response
                                    select response.Result).FirstOrDefault();
                 image.Base64 = imageBinary;
+                image = MarkPixelCoordinates(parkingEvent: parkingEvent, image: image);
             }
             if (image == null) return;
-            image.PropertyId = propertyId;
+            image.PropertyId = parkingEvent.Properties.Id;
             image.ImageAssetUid = imageAssetUid;
             Save(image);
             //return image.Base64;
+        }
+
+        private static Bitmap Base64StringToBitmap(string base64String)
+        {
+            Bitmap bmpReturn = null;
+            byte[] byteBuffer = Convert.FromBase64String(base64String);
+            MemoryStream memoryStream = new MemoryStream(byteBuffer) {Position = 0};
+            bmpReturn = (Bitmap) System.Drawing.Image.FromStream(memoryStream);
+            memoryStream.Close();
+            memoryStream = null;
+            byteBuffer = null;
+            return bmpReturn;
+        }
+
+        private Image MarkPixelCoordinates(ParkingEvent parkingEvent, Image image)
+        {
+            try
+            {
+                image.OriginalBase64 = image.Base64;
+                if (!string.IsNullOrWhiteSpace(parkingEvent.Properties.PixelCoordinates))
+                {
+                    var bitMapImage = Base64StringToBitmap(image.Base64);
+                    var coordinates = parkingEvent.Properties.PixelCoordinates.Split(',').ToList();
+                    foreach (var coordinate in coordinates)
+                    {
+                        var xys = coordinate.Split(':').Select(int.Parse).ToList();
+                        bitMapImage.SetPixel(xys[0], xys[1], Color.DarkSalmon);
+                    }
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        bitMapImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        byte[] byteImage = ms.ToArray();
+                        image.Base64 = Convert.ToBase64String(byteImage); //Get Base64
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Commentary.Print(
+                    $"Failed to mark pixel coordinates {parkingEvent.Properties.PixelCoordinates} PropertyId {parkingEvent.Properties.Id}");
+                Commentary.Print(e.Message);
+                return image;
+            }
+
+            return image;
         }
 
         private Media GetMedia(string imageAssetUid, string timestamp)
