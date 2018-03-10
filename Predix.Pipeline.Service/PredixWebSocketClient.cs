@@ -27,7 +27,7 @@ namespace Predix.Pipeline.Service
     {
         private readonly ISecurity _securityService = new SecurityService();
 
-        public async Task OpenAsync(string url, string bodyMessage,
+        public void OpenAsync(string url, string bodyMessage,
             Dictionary<string, string> additionalHeaders, IImage imageService, Options options)
         {
             _securityService.SetClientToken().Wait();
@@ -61,8 +61,8 @@ namespace Predix.Pipeline.Service
                     try
                     {
                         ArraySegment<byte> bytesToSend = new ArraySegment<byte>(Encoding.UTF8.GetBytes(bodyMessage));
-                        await clientWebSocket.SendAsync(bytesToSend, WebSocketMessageType.Text, true,
-                            CancellationToken.None);
+                        clientWebSocket.SendAsync(bytesToSend, WebSocketMessageType.Text, true,
+                            CancellationToken.None).Wait(cancellationTokenSource.Token);
                         byte[] incomingData = new byte[1024];
                         WebSocketReceiveResult result =
                             clientWebSocket.ReceiveAsync(new ArraySegment<byte>(incomingData), CancellationToken.None)

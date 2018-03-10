@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Predix.Domain.Model.Constant;
@@ -80,24 +81,25 @@ namespace Predix.Pipeline.Service
 
         private static Bitmap Base64StringToBitmap(string base64String)
         {
-            Bitmap bmpReturn = null;
             byte[] byteBuffer = Convert.FromBase64String(base64String);
-            MemoryStream memoryStream = new MemoryStream(byteBuffer) {Position = 0};
-            bmpReturn = (Bitmap) System.Drawing.Image.FromStream(memoryStream);
-            memoryStream.Close();
-            memoryStream = null;
-            byteBuffer = null;
-            return bmpReturn;
+            using (MemoryStream memoryStream = new MemoryStream(byteBuffer))
+            {
+                var bmpReturn = (Bitmap) System.Drawing.Image.FromStream(memoryStream);
+                memoryStream.Close();
+                return bmpReturn;
+            }
         }
 
-        private Image MarkPixelCoordinates(ParkingEvent parkingEvent, Image image)
+        public Image MarkPixelCoordinates(ParkingEvent parkingEvent, Image image)
         {
             try
             {
                 image.OriginalBase64 = image.Base64;
                 if (!string.IsNullOrWhiteSpace(parkingEvent.Properties.PixelCoordinates))
                 {
-                    var bitMapImage = Base64StringToBitmap(image.Base64);
+                    string converted = image.Base64.Split(',').ToList<string>()[1];
+
+                    var bitMapImage = Base64StringToBitmap(converted);
                     var coordinates = parkingEvent.Properties.PixelCoordinates.Split(',').ToList();
                     foreach (var coordinate in coordinates)
                     {

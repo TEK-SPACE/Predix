@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.ServiceProcess;
+using System.Threading.Tasks;
 using Predix.Domain.Model;
 using Predix.Pipeline.DataService;
 using Predix.Pipeline.Helper;
@@ -18,41 +19,34 @@ namespace Predix.Pipeline.WinService
         private static IEvent _eventService;
         private static IImage _imageService;
         private static readonly Dictionary<string, object> GlobalVariables = new Dictionary<string, object>();
-        private readonly System.Timers.Timer _timeDelay;
 
         public PredixPipelineService()
         {
             InitializeComponent();
-            _timeDelay = new System.Timers.Timer();
-            _timeDelay.Elapsed += WorkProcess;
+        }
+
+        protected override void OnStart(string[] args)
+        {
+            Commentary.Print("Service is Started");
 
             Commentary.WriteToFile = true;
             _locationService = new LocationService(GlobalVariables);
             _eventService = new EventService(GlobalVariables);
             _imageService = new ImageService(GlobalVariables);
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<PredixContext, PredixContextInitializer>());
-        }
 
-        protected override void OnStart(string[] args)
-        {
-            Commentary.Print("Service is Started");
-            _timeDelay.Enabled = true;
-            OpenSocket();
+            Task.Run(() => OpenSocket());
         }
 
         protected override void OnStop()
         {
             Commentary.Print("Service is Stoped");
-            _timeDelay.Enabled = false;
         }
 
-        public void WorkProcess(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            //OpenSocket();
-        }
 
         private void OpenSocket()
         {
+
             Options options = new Options
             {
                 IgnoreRegulationCheck = Convert.ToBoolean(ConfigurationManager.AppSettings["IgnoreRegulationCheck"]),
@@ -61,6 +55,8 @@ namespace Predix.Pipeline.WinService
                 SaveEvents = Convert.ToBoolean(ConfigurationManager.AppSettings["SaveEvents"]),
                 SaveImages = Convert.ToBoolean(ConfigurationManager.AppSettings["SaveImages"])
             };
+            Commentary.Print(
+                $"\nRefresh Location = {options.RefreshLocations}\nIgnore Regulation Check = {options.IgnoreRegulationCheck}\nSave Events = {options.SaveEvents}\nSave Images= {options.SaveImages}\nMark All As Violations= {options.MarkAllAsViolations}");
             var locationType = "PARKING_ZONE";
             int pagesize = 50;
             List<Boundary> boundaries = _locationService.GetBoundaries();
@@ -77,7 +73,7 @@ namespace Predix.Pipeline.WinService
                     _locationService.Details(locations.Select(x => x.LocationUid).Distinct().ToList());
                 }
 
-                _eventService.GetByBoundary(boundary.Range, "PKIN", "PKOUT", _imageService, options);
+                _eventService.GetByBoundaryAsync(boundary.Range, "PKIN", "PKOUT", _imageService, options);
             }
 
             Commentary.Print($"Completed. Please enter a key to exit");

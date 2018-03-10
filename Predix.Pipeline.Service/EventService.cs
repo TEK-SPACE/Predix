@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Predix.Domain.Model;
@@ -39,7 +40,7 @@ namespace Predix.Pipeline.Service
             }
             return details;
         }
-        public void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService, Options options)
+        public void GetByBoundaryAsync(string bbox, string eventType1, string eventType2, IImage imageService, Options options)
         {
             //ParkingEvent parkingEvent = null;
             Dictionary<string, string> additionalHeaders =
@@ -48,7 +49,7 @@ namespace Predix.Pipeline.Service
             while (true)
             {
                 _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders,
-                    imageService, options).Wait();
+                    imageService, options);
             }
 
             //if (!string.IsNullOrWhiteSpace(response.Result))

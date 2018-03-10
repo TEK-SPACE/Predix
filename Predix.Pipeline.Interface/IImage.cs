@@ -12,5 +12,7 @@ namespace Predix.Pipeline.Interface
         /// <param name="timestamp"></param>
         /// <returns>Base64 Image</returns>
         void MediaOnDemand(ParkingEvent parkingEvent, string imageAssetUid, string timestamp);
+
+        Image MarkPixelCoordinates(ParkingEvent parkingEvent, Image image);
     }
 }

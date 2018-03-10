@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Predix.Domain.Model;
 using Predix.Domain.Model.Location;
 
@@ -25,7 +26,7 @@ namespace Predix.Pipeline.Interface
         /// <param name="eventType2"></param>
         /// <param name="imageService"></param>
         /// <param name="options"></param>
-        void GetByBoundary(string bbox, string eventType1, string eventType2, IImage imageService, Options options);
+        void GetByBoundaryAsync(string bbox, string eventType1, string eventType2, IImage imageService, Options options);
 
         /// <summary>
         /// 
