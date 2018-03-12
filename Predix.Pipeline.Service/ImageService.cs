@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -79,9 +80,45 @@ namespace Predix.Pipeline.Service
             //return image.Base64;
         }
 
+        public static bool IsBase64(string base64String)
+        {
+            if (string.IsNullOrEmpty(base64String) || base64String.Length % 4 != 0
+                || base64String.Contains(" ") || base64String.Contains("\t") || base64String.Contains("\r") || base64String.Contains("\n"))
+                return false;
+
+            try
+            {
+                var fromBase64String = Convert.FromBase64String(base64String);
+                return true;
+            }
+#pragma warning disable 168
+            catch (Exception exception)
+#pragma warning restore 168
+            {
+                // Handle the exception
+            }
+            return false;
+        }
         private static Bitmap Base64StringToBitmap(string base64String)
         {
+            //int mod4 = base64String.Length % 4;
+            //if (mod4 > 0)
+            //{
+            //    base64String += new string('=', 4 - mod4);
+            //}
+
+
+            base64String = base64String.Remove(base64String.Length - 1, 1);
+
             byte[] byteBuffer = Convert.FromBase64String(base64String);
+            //System.Drawing.Image image;
+            //using (MemoryStream ms = new MemoryStream(byteBuffer))
+            //{
+            //    image = System.Drawing.Image.FromStream(ms);
+
+            //    image.Save("c://zz.jpg",ImageFormat.Jpeg);
+            //}
+          
             using (MemoryStream memoryStream = new MemoryStream(byteBuffer))
             {
                 var bmpReturn = (Bitmap) System.Drawing.Image.FromStream(memoryStream);
@@ -97,21 +134,36 @@ namespace Predix.Pipeline.Service
                 image.OriginalBase64 = image.Base64;
                 if (!string.IsNullOrWhiteSpace(parkingEvent.Properties.PixelCoordinates))
                 {
-                    string converted = image.Base64.Split(',').ToList<string>()[1];
-
-                    var bitMapImage = Base64StringToBitmap(converted);
+                    //IsBase64(image.Base64);
+                    string selectedBase64 = image.Base64.Split(',').ToList<string>()[1];
+                    var bitMapImage = Base64StringToBitmap(selectedBase64);
                     var coordinates = parkingEvent.Properties.PixelCoordinates.Split(',').ToList();
-                    foreach (var coordinate in coordinates)
+                    using (var graphics = Graphics.FromImage(bitMapImage))
                     {
-                        var xys = coordinate.Split(':').Select(int.Parse).ToList();
-                        bitMapImage.SetPixel(xys[0], xys[1], Color.DarkSalmon);
+                        Pen blackPen = new Pen(Color.Black, 3);
+                        graphics.DrawPolygon(blackPen, new PointF[]
+                        {
+                            new PointF(coordinates[0].Split(':').Select(float.Parse).ToList()[0],
+                                coordinates[0].Split(':').Select(int.Parse).ToList()[1]),
+                            new PointF(coordinates[1].Split(':').Select(int.Parse).ToList()[0],
+                                coordinates[1].Split(':').Select(int.Parse).ToList()[1]),
+                            new PointF(coordinates[2].Split(':').Select(float.Parse).ToList()[0],
+                                coordinates[2].Split(':').Select(int.Parse).ToList()[1]),
+                            new PointF(coordinates[3].Split(':').Select(int.Parse).ToList()[0],
+                                coordinates[3].Split(':').Select(int.Parse).ToList()[1])
+                        });
                     }
 
-                    using (MemoryStream ms = new MemoryStream())
+                    using (MemoryStream memoryStream = new MemoryStream())
                     {
-                        bitMapImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                        byte[] byteImage = ms.ToArray();
-                        image.Base64 = Convert.ToBase64String(byteImage); //Get Base64
+                        //using (FileStream fs = new FileStream(@"C:\Users\hbopuri\AppData\Local\Temp\geviolation.jpg", FileMode.Create, FileAccess.ReadWrite))
+                        //{
+                            bitMapImage.Save(memoryStream, ImageFormat.Jpeg);
+                            byte[] bytes = memoryStream.ToArray();
+                            //fs.Write(bytes, 0, bytes.Length);
+                            image.Base64 = image.Base64.Split(',').ToList<string>()[0] +
+                                           Convert.ToBase64String(bytes); //Get Base64
+                        //}
                     }
                 }
             }
