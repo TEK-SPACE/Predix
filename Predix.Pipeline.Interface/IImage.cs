@@ -1,4 +1,6 @@
-﻿using Predix.Domain.Model.Location;
+﻿using System;
+using System.Collections.Generic;
+using Predix.Domain.Model.Location;
 
 namespace Predix.Pipeline.Interface
 {
@@ -14,5 +16,6 @@ namespace Predix.Pipeline.Interface
         void MediaOnDemand(ParkingEvent parkingEvent, string imageAssetUid, string timestamp);
 
         Image MarkPixelCoordinates(ParkingEvent parkingEvent, Image image);
+        List<Tuple<int, string, string>> GetRecentBase64();
     }
 }

@@ -6,7 +6,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Predix.Domain.Model.Constant;
@@ -101,24 +100,7 @@ namespace Predix.Pipeline.Service
         }
         private static Bitmap Base64StringToBitmap(string base64String)
         {
-            //int mod4 = base64String.Length % 4;
-            //if (mod4 > 0)
-            //{
-            //    base64String += new string('=', 4 - mod4);
-            //}
-
-
-            base64String = base64String.Remove(base64String.Length - 1, 1);
-
             byte[] byteBuffer = Convert.FromBase64String(base64String);
-            //System.Drawing.Image image;
-            //using (MemoryStream ms = new MemoryStream(byteBuffer))
-            //{
-            //    image = System.Drawing.Image.FromStream(ms);
-
-            //    image.Save("c://zz.jpg",ImageFormat.Jpeg);
-            //}
-          
             using (MemoryStream memoryStream = new MemoryStream(byteBuffer))
             {
                 var bmpReturn = (Bitmap) System.Drawing.Image.FromStream(memoryStream);
@@ -136,33 +118,49 @@ namespace Predix.Pipeline.Service
                 {
                     //IsBase64(image.Base64);
                     string selectedBase64 = image.Base64.Split(',').ToList<string>()[1];
-                    var bitMapImage = Base64StringToBitmap(selectedBase64);
+                    var bitMapImage = Base64StringToBitmap(selectedBase64.Trim());
                     var coordinates = parkingEvent.Properties.PixelCoordinates.Split(',').ToList();
                     using (var graphics = Graphics.FromImage(bitMapImage))
                     {
-                        Pen blackPen = new Pen(Color.Black, 3);
-                        graphics.DrawPolygon(blackPen, new PointF[]
+                        Pen yellowPen = new Pen(Color.Yellow, 3);
+                        try
                         {
-                            new PointF(coordinates[0].Split(':').Select(float.Parse).ToList()[0],
-                                coordinates[0].Split(':').Select(int.Parse).ToList()[1]),
-                            new PointF(coordinates[1].Split(':').Select(int.Parse).ToList()[0],
-                                coordinates[1].Split(':').Select(int.Parse).ToList()[1]),
-                            new PointF(coordinates[2].Split(':').Select(float.Parse).ToList()[0],
-                                coordinates[2].Split(':').Select(int.Parse).ToList()[1]),
-                            new PointF(coordinates[3].Split(':').Select(int.Parse).ToList()[0],
-                                coordinates[3].Split(':').Select(int.Parse).ToList()[1])
-                        });
+                            var a1 = coordinates[0].Split(':').Select(float.Parse).ToList()[0];
+                            var a2 = coordinates[0].Split(':').Select(float.Parse).ToList()[1];
+                            var b1 = coordinates[1].Split(':').Select(float.Parse).ToList()[0];
+                            var b2 = coordinates[1].Split(':').Select(float.Parse).ToList()[1];
+                            var c1 = coordinates[2].Split(':').Select(float.Parse).ToList()[0];
+                            var c2 = coordinates[2].Split(':').Select(float.Parse).ToList()[1];
+                            var d1 = coordinates[3].Split(':').Select(float.Parse).ToList()[0];
+                            var d2 = coordinates[3].Split(':').Select(float.Parse).ToList()[1];
+                            graphics.DrawPolygon(yellowPen, new PointF[]
+                            {
+                                new PointF(a1, a2),
+                                new PointF(b1, b2),
+                                new PointF(c1, c2),
+                                new PointF(d1, d2)
+                            });
+                        }
+                        catch (Exception e)
+                        {
+                            Commentary.Print(
+                                $"Failed to mark pixel coordinates {parkingEvent.Properties.PixelCoordinates} PropertyId {parkingEvent.Properties.Id}");
+                            Commentary.Print(e.Message);
+                        }
+
                     }
 
                     using (MemoryStream memoryStream = new MemoryStream())
                     {
-                        //using (FileStream fs = new FileStream(@"C:\Users\hbopuri\AppData\Local\Temp\geviolation.jpg", FileMode.Create, FileAccess.ReadWrite))
+                        string randomTempFileName = Path.GetTempPath();
+                        //using (FileStream fs = new FileStream($"{randomTempFileName}\\CivicSmart\\geviolation{DateTime.Now.Ticks}.jpg",
+                        //    FileMode.Create, FileAccess.ReadWrite))
                         //{
                             bitMapImage.Save(memoryStream, ImageFormat.Jpeg);
                             byte[] bytes = memoryStream.ToArray();
                             //fs.Write(bytes, 0, bytes.Length);
-                            image.Base64 = image.Base64.Split(',').ToList<string>()[0] +
-                                           Convert.ToBase64String(bytes); //Get Base64
+                            image.Base64 = image.Base64.Split(',').ToList<string>()[0] + "," +
+                                           Convert.ToBase64String(bytes);
                         //}
                     }
                 }
@@ -170,12 +168,33 @@ namespace Predix.Pipeline.Service
             catch (Exception e)
             {
                 Commentary.Print(
-                    $"Failed to mark pixel coordinates {parkingEvent.Properties.PixelCoordinates} PropertyId {parkingEvent.Properties.Id}");
+                    $"Failed to convert base64 to Image {image.Base64} PropertyId {parkingEvent.Properties.Id}");
                 Commentary.Print(e.Message);
                 return image;
             }
 
             return image;
+        }
+
+        public List<Tuple<int, string, string>> GetRecentBase64()
+        {
+            using (PredixContext context = new PredixContext())
+            {
+                context.Database.CommandTimeout = 1200;
+                var results = (from pep in context.ParkingEventProperties
+                    join i in context.Images on pep.ImageAssetUid equals i.ImageAssetUid
+                    select new
+                    {
+                        pep.Id,
+                        pep.PixelCoordinates,
+                        i.Base64
+                    }).Take(5).ToList().Select(f => new Tuple<int, string, string>(
+                    f.Id,
+                    f.PixelCoordinates,
+                    f.Base64
+                )).ToList();
+                return results;
+            }
         }
 
         private Media GetMedia(string imageAssetUid, string timestamp)

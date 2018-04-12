@@ -56,7 +56,15 @@ namespace Predix.Pipeline.WinService
                 SaveImages = Convert.ToBoolean(ConfigurationManager.AppSettings["SaveImages"])
             };
             Commentary.Print(
-                $"\nRefresh Location = {options.RefreshLocations}\nIgnore Regulation Check = {options.IgnoreRegulationCheck}\nSave Events = {options.SaveEvents}\nSave Images= {options.SaveImages}\nMark All As Violations= {options.MarkAllAsViolations}");
+                $"\nRefresh Location = {options.RefreshLocations}");
+            Commentary.Print(
+                $"\nIgnore Regulation Check = {options.IgnoreRegulationCheck}");
+            Commentary.Print(
+                $"\nSave Events = {options.SaveEvents}");
+            Commentary.Print(
+                $"\nSave Images= {options.SaveImages}");
+            Commentary.Print(
+                $"\nMark All As Violations= {options.MarkAllAsViolations}");
             var locationType = "PARKING_ZONE";
             int pagesize = 50;
             List<Boundary> boundaries = _locationService.GetBoundaries();

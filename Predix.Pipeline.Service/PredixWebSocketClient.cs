@@ -99,7 +99,8 @@ namespace Predix.Pipeline.Service
                         imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
                         continue;
                     }
-
+                    if(parkingEvent.Properties == null)
+                        parkingEvent.Properties = new ParkingEventProperties();
                     parkingEvent.Properties.LocationUid = parkingEvent.LocationUid;
                     //parkingEvent.Properties.EventUid = parkingEvent.Id
                     //parkingEvent.Properties.ParkingEventId = parkingEvent.Id;
