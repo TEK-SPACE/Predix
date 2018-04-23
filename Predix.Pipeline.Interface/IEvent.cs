@@ -16,7 +16,7 @@ namespace Predix.Pipeline.Interface
         /// <param name="imageService"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        void GetByLocation(string locationUid, string eventType, IImage imageService, Options options);
+        void GetByLocation(string locationUid, string eventType, IImage imageService, Options options, int customerId);
 
         /// <summary>
         /// 
@@ -26,7 +26,8 @@ namespace Predix.Pipeline.Interface
         /// <param name="eventType2"></param>
         /// <param name="imageService"></param>
         /// <param name="options"></param>
-        void GetByBoundaryAsync(string bbox, string eventType1, string eventType2, IImage imageService, Options options);
+        /// <param name="customerId"></param>
+        void GetByBoundaryAsync(string bbox, string eventType1, string eventType2, IImage imageService, Options options, int customerId);
 
         /// <summary>
         /// 

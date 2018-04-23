@@ -71,6 +71,8 @@ namespace Predix.Domain.Model
         public ViolationType ViolationType { get; set; }
         public DateTime? EventInDateTime { get; set; }
         public DateTime? EventOutDateTime { get; set; }
+        public DateTime CreatedDateTime { get; set; }
+        public DateTime ModifiedDateTime { get; set; }
 
         [Column(TypeName = "nvarchar")]
         [StringLength(4000)]

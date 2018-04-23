@@ -18,10 +18,10 @@ namespace Predix.Pipeline.Test
             _eventService = new EventService(_globalVariables);
         }
         [Test]
-        [TestCase("LOCATION-225", "PKIN")]
-        public void GetWebSocketTest(string locationUid, string eventType)
+        [TestCase("LOCATION-225", "PKIN", 4120)]
+        public void GetWebSocketTest(string locationUid, string eventType, int customerId)
         {
-            _eventService.GetByLocation(locationUid, eventType,new ImageService(new Dictionary<string, object>()),new Options());
+            _eventService.GetByLocation(locationUid, eventType,new ImageService(new Dictionary<string, object>()),new Options(), customerId);
             //Assert.IsNotNull(details);
             //Assert.AreSame(new ParkingEvent(), details);
         }

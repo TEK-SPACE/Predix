@@ -6,6 +6,8 @@ namespace Predix.Domain.Model
     {
         [Key]
         public int Id { get; set; }
+
+        public int CustomerId { get; set; }
         [StringLength(500)]
         public string Range { get; set; }
         [StringLength(2000)]

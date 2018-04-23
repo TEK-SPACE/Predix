@@ -28,7 +28,7 @@ namespace Predix.Pipeline.Service
         private readonly ISecurity _securityService = new SecurityService();
 
         public void OpenAsync(string url, string bodyMessage,
-            Dictionary<string, string> additionalHeaders, IImage imageService, Options options)
+            Dictionary<string, string> additionalHeaders, IImage imageService, Options options, int customerId)
         {
             _securityService.SetClientToken().Wait();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
@@ -92,6 +92,7 @@ namespace Predix.Pipeline.Service
                         ? (jsonRespone).ToObject<ParkingEvent>()
                         : new ParkingEvent();
                     Commentary.Print($"Location ID :{parkingEvent.LocationUid}");
+                    parkingEvent.CustomerId = customerId;
                     if (options.IgnoreRegulationCheck)
                     {
                         Commentary.Print($"Skipping Regulation Check Alg", true);
@@ -135,6 +136,7 @@ namespace Predix.Pipeline.Service
                                         inEvent.ViolationDuration = DateTime.Now.TimeOfDay
                                             .Subtract(inEvent.ParkinTime.Value).Minutes;
                                         inEvent.ExceedParkingLimit = true;
+                                        inEvent.ModifiedDateTime = DateTime.UtcNow;
                                         innerContext.SaveChanges();
                                         break;
                                     }
@@ -232,7 +234,10 @@ namespace Predix.Pipeline.Service
                                     .Contains(DateTime.Now.DayOfWeek.ToString().Substring(0, 3)))
                                 {
                                     isVoilation = false;
-                                    GeViolation geViolation = new GeViolation();
+                                    GeViolation geViolation = new GeViolation
+                                    {
+                                        CreatedDateTime = DateTime.UtcNow
+                                    };
 
                                     switch (regulation.ViolationType)
                                     {
@@ -256,6 +261,7 @@ namespace Predix.Pipeline.Service
                                                                 .Subtract(inEvent.ParkinTime.Value).Minutes;
                                                             inEvent.ExceedParkingLimit = true;
                                                             inEvent.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                                                            inEvent.ModifiedDateTime = DateTime.UtcNow;
                                                             innerContext.SaveChanges();
                                                             break;
                                                         }
@@ -304,6 +310,7 @@ namespace Predix.Pipeline.Service
                                                             inEvent.ViolationDuration = DateTime.Now.TimeOfDay
                                                                 .Subtract(inEvent.ParkinTime.Value).Minutes;
                                                             inEvent.ExceedParkingLimit = true;
+                                                            inEvent.ModifiedDateTime = DateTime.UtcNow;
                                                             innerContext.SaveChanges();
                                                             break;
                                                         }
@@ -370,6 +377,7 @@ namespace Predix.Pipeline.Service
                                                         inEvent.ViolationDuration = DateTime.Now.TimeOfDay
                                                             .Subtract(inEvent.ParkinTime.Value).Minutes;
                                                         inEvent.ExceedParkingLimit = true;
+                                                        inEvent.ModifiedDateTime = DateTime.UtcNow;
                                                         innerContext.SaveChanges();
                                                     }
                                                 }
@@ -396,6 +404,7 @@ namespace Predix.Pipeline.Service
                                                         inEvent.ViolationDuration = DateTime.Now.TimeOfDay
                                                             .Subtract(inEvent.ParkinTime.Value).Minutes;
                                                         inEvent.ExceedParkingLimit = true;
+                                                        inEvent.ModifiedDateTime = DateTime.UtcNow;
                                                         innerContext.SaveChanges();
                                                         break;
                                                     }

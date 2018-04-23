@@ -81,7 +81,7 @@ namespace Predix.Pipeline.WinService
                     _locationService.Details(locations.Select(x => x.LocationUid).Distinct().ToList());
                 }
 
-                _eventService.GetByBoundaryAsync(boundary.Range, "PKIN", "PKOUT", _imageService, options);
+                _eventService.GetByBoundaryAsync(boundary.Range, "PKIN", "PKOUT", _imageService, options, boundary.CustomerId);
             }
 
             Commentary.Print($"Completed. Please enter a key to exit");

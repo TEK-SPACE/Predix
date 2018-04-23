@@ -7,6 +7,6 @@ namespace Predix.Pipeline.Interface
     public interface IPredixWebSocketClient
     {
         void OpenAsync(string url, string bodyMessage, Dictionary<string, string> additionalHeaders,
-            IImage imageService, Options options);
+            IImage imageService, Options options, int customerId);
     }
 }

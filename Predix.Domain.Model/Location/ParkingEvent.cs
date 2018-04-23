@@ -72,5 +72,7 @@ namespace Predix.Domain.Model.Location
         //public virtual List<ParkingEventProperties> Propertieses { get; set; }
         [JsonIgnore]
         public double MatchRate { get; set; }
+
+        public int CustomerId { get; set; }
     }
 }
