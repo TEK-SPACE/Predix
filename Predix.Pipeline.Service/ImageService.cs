@@ -140,6 +140,34 @@ namespace Predix.Pipeline.Service
                                 new PointF(c1, c2),
                                 new PointF(d1, d2)
                             });
+                            // Create font and brush.
+                            Font drawFont = new Font("Arial", 26);
+                            SolidBrush drawBrush = new SolidBrush(Color.White);
+
+                            // Create point for upper-left corner of drawing.
+                            PointF drawPoint = new PointF(150.0F, 110.0F);
+                            //StringFormat stringFormat = new StringFormat
+                            //{
+                            //    LineAlignment = StringAlignment.Center,
+                            //    Alignment = StringAlignment.Center
+                            //};
+                            //graphics.DrawString($"Event Id: {parkingEvent.Id}, Asset Uid: {parkingEvent.AssetUid}, Pixel Coordinates {parkingEvent.Properties.PixelCoordinates}",
+                            //    drawFont, drawBrush, drawPoint);
+                            List<string> writings = new List<string>
+                            {
+                                $"Event Id: {parkingEvent.Id}",
+                                $"In or Out: {parkingEvent.EventType}",
+                                $"Timestamp: {parkingEvent.Timestamp} {parkingEvent.EventTime?.ToString("F")}",
+                                $"Location Uid: {parkingEvent.LocationUid}",
+                                $"Asset Uid: {parkingEvent.AssetUid}",
+                                $"Pixel Coordinates {parkingEvent.Properties.PixelCoordinates}"
+                            };
+                            foreach (var writing in writings)
+                            {
+                                drawPoint.Y = drawPoint.Y + 40;
+                                graphics.DrawString(writing,
+                                    drawFont, drawBrush, drawPoint);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -153,15 +181,19 @@ namespace Predix.Pipeline.Service
                     using (MemoryStream memoryStream = new MemoryStream())
                     {
                         string randomTempFileName = Path.GetTempPath();
-                        //using (FileStream fs = new FileStream($"{randomTempFileName}\\CivicSmart\\geviolation{DateTime.Now.Ticks}.jpg",
-                        //    FileMode.Create, FileAccess.ReadWrite))
-                        //{
+                        if(!Directory.Exists($"{randomTempFileName}\\CivicSmart\\{DateTime.Now:yyyy-MM-dd}"))
+                        {
+                            Directory.CreateDirectory($"{randomTempFileName}\\CivicSmart\\{DateTime.Now:yyyy-MM-dd}");
+                        }
+                        using (FileStream fs = new FileStream($"{randomTempFileName}\\CivicSmart\\{DateTime.Now:yyyy-MM-dd}\\geviolation{DateTime.Now.Ticks}.jpg",
+                            FileMode.Create, FileAccess.ReadWrite))
+                        {
                             bitMapImage.Save(memoryStream, ImageFormat.Jpeg);
                             byte[] bytes = memoryStream.ToArray();
-                            //fs.Write(bytes, 0, bytes.Length);
+                            fs.Write(bytes, 0, bytes.Length);
                             image.Base64 = image.Base64.Split(',').ToList<string>()[0] + "," +
                                            Convert.ToBase64String(bytes);
-                        //}
+                        }
                     }
                 }
             }
