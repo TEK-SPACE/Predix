@@ -181,13 +181,17 @@ namespace Predix.Pipeline.Service
                     using (MemoryStream memoryStream = new MemoryStream())
                     {
                         string randomTempFileName = Path.GetTempPath();
-                        if(!Directory.Exists($"{randomTempFileName}\\CivicSmart\\{DateTime.Now:yyyy-MM-dd}"))
+                        if(!Directory.Exists($"{randomTempFileName}CivicSmart\\{DateTime.Now:yyyy-MM-dd}"))
                         {
-                            Directory.CreateDirectory($"{randomTempFileName}\\CivicSmart\\{DateTime.Now:yyyy-MM-dd}");
+                            Directory.CreateDirectory($"{randomTempFileName}CivicSmart\\{DateTime.Now:yyyy-MM-dd}");
                         }
-                        using (FileStream fs = new FileStream($"{randomTempFileName}\\CivicSmart\\{DateTime.Now:yyyy-MM-dd}\\geviolation{DateTime.Now.Ticks}.jpg",
+
+                        var fileName =
+                            $"{randomTempFileName}CivicSmart\\{DateTime.Now:yyyy-MM-dd}\\geviolation{DateTime.Now.Ticks}.jpg";
+                        using (FileStream fs = new FileStream(fileName,
                             FileMode.Create, FileAccess.ReadWrite))
                         {
+                            Commentary.Print($"Image: {fileName}", true);
                             bitMapImage.Save(memoryStream, ImageFormat.Jpeg);
                             byte[] bytes = memoryStream.ToArray();
                             fs.Write(bytes, 0, bytes.Length);

@@ -87,367 +87,412 @@ namespace Predix.Pipeline.Service
                     }
 
                     if (string.IsNullOrWhiteSpace(response)) continue;
-                    var jsonRespone = JsonConvert.DeserializeObject<JObject>(response);
-                    ParkingEvent parkingEvent = jsonRespone != null
-                        ? (jsonRespone).ToObject<ParkingEvent>()
-                        : new ParkingEvent();
-                    Commentary.Print($"Location ID :{parkingEvent.LocationUid}");
-                    parkingEvent.CustomerId = customerId;
-                    if (options.IgnoreRegulationCheck)
-                    {
-                        Commentary.Print($"Skipping Regulation Check Alg", true);
-                        Save(parkingEvent);
-                        imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
-                        continue;
-                    }
-                    if(parkingEvent.Properties == null)
-                        parkingEvent.Properties = new ParkingEventProperties();
-                    parkingEvent.Properties.LocationUid = parkingEvent.LocationUid;
-                    //parkingEvent.Properties.EventUid = parkingEvent.Id
-                    //parkingEvent.Properties.ParkingEventId = parkingEvent.Id;
-
-                    var isVoilation = false;
-                    using (var context = new PredixContext())
-                    {
-                        var nodeMasterRegulations =
-                            context.NodeMasterRegulations.Include(x => x.ParkingRegulation).ToList();
-
-                        //check if GEO Coordinates match
-
-                        var nodeMasterRegulation =
-                            nodeMasterRegulations.Where(x => x.LocationUid == parkingEvent.LocationUid)
-                                .ToList();
-                        if (options.MarkAllAsViolations)
-                        {
-                            #region Temp Push all as violoations
-
-                            if (parkingEvent.EventType.Equals("PKOUT"))
-                            {
-                                using (var innerContext = new PredixContext())
-                                {
-                                    var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
-                                        x.ObjectUid == parkingEvent.Properties.ObjectUid &&
-                                        x.LocationUid == parkingEvent.LocationUid);
-                                    if (inEvent?.ParkinTime != null)
-                                    {
-                                        inEvent.ExceedParkingLimit = true;
-                                        inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
-                                        inEvent.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                        inEvent.ViolationDuration = DateTime.Now.TimeOfDay
-                                            .Subtract(inEvent.ParkinTime.Value).Minutes;
-                                        inEvent.ExceedParkingLimit = true;
-                                        inEvent.ModifiedDateTime = DateTime.UtcNow;
-                                        innerContext.SaveChanges();
-                                        break;
-                                    }
-                                }
-                            }
-
-                            GeViolation geViolation = new GeViolation
-                            {
-                                NoParking = true,
-                                ObjectUid = parkingEvent.Properties.ObjectUid,
-                                LocationUid = parkingEvent.LocationUid
-                            };
-                            if (parkingEvent.EventType.Equals("PKIN"))
-                            {
-                                geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                geViolation.ParkinTime = DateTime.Now.TimeOfDay;
-                            }
-
-                            if (parkingEvent.EventType.Equals("PKOUT"))
-                            {
-                                geViolation.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                geViolation.ParkoutTime = DateTime.Now.TimeOfDay;
-                            }
-                            geViolation.RegulationId = 81;
-                            geViolation.ViolationType = ViolationType.FireHydrant;
-
-                            context.GeViolations.Add(geViolation);
-
-                            #endregion
-                        }
-                        else if (nodeMasterRegulation.Any())
-                        {
-                            var latLongs = parkingEvent.Properties.GeoCoordinates.Split(',').ToList();
-                            //var geoCoordinates = new List<GeoCoordinate>();
-                            //foreach (var latLong in latLongs)
-                            //{
-                            //    geoCoordinates.Add(new GeoCoordinate(Convert.ToDouble(latLong.Split(':')[0]),
-                            //        Convert.ToDouble(latLong.Split(':')[1])));
-                            //}
-
-                            //var centralCoordinates = GetCentralGeoCoordinate(geoCoordinates);
-
-                            //var parkingRegulations = nodeMasterRegulation.Where(x =>
-                            //        IsPointInPolygon4(new List<PointF>
-                            //            {
-                            //                new PointF(float.Parse(x.ParkingRegulation.Coodrinate1.Split(':')[0]),
-                            //                    float.Parse(x.ParkingRegulation.Coodrinate1.Split(':')[1]))
-                            //            }.ToArray(),
-                            //            new PointF(
-                            //                float.Parse(
-                            //                    centralCoordinates.Latitude.ToString(CultureInfo.InvariantCulture)),
-                            //                float.Parse(
-                            //                    centralCoordinates.Latitude.ToString(CultureInfo.InvariantCulture)))))
-                            //    .Select(x => x.ParkingRegulation).ToList();
-                            var parkingRegulations = new List<ParkingRegulation>();
-                            foreach (var regulation in nodeMasterRegulation)
-                            {
-                                //var include = false;
-
-                                foreach (var latLong in latLongs)
-                                {
-                                    if (IsPointInPolygon4(new List<PointF>
-                                        {
-                                            new PointF(
-                                                float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[0]),
-                                                float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[1])),
-                                            new PointF(
-                                                float.Parse(regulation.ParkingRegulation.Coodrinate2.Split(':')[0]),
-                                                float.Parse(regulation.ParkingRegulation.Coodrinate2.Split(':')[1])),
-                                            new PointF(
-                                                float.Parse(regulation.ParkingRegulation.Coodrinate3.Split(':')[0]),
-                                                float.Parse(regulation.ParkingRegulation.Coodrinate3.Split(':')[1])),
-                                            new PointF(
-                                                float.Parse(regulation.ParkingRegulation.Coodrinate4.Split(':')[0]),
-                                                float.Parse(regulation.ParkingRegulation.Coodrinate4.Split(':')[1]))
-                                        }.ToArray(),
-                                        new PointF(float.Parse(latLong.Split(':')[0]),
-                                            float.Parse(latLong.Split(':')[1]))))
-                                    {
-                                        //include = true;
-                                        parkingEvent.MatchRate += 25;
-                                    }
-
-                                    //if (include)
-                                    //    break;
-                                }
-
-                                if (parkingEvent.MatchRate > 0)
-                                    parkingRegulations.Add(regulation.ParkingRegulation);
-                            }
-
-                            foreach (var regulation in parkingRegulations)
-                            {
-                                if (regulation.DayOfWeek.Split('|')
-                                    .Contains(DateTime.Now.DayOfWeek.ToString().Substring(0, 3)))
-                                {
-                                    isVoilation = false;
-                                    GeViolation geViolation = new GeViolation
-                                    {
-                                        CreatedDateTime = DateTime.UtcNow
-                                    };
-
-                                    switch (regulation.ViolationType)
-                                    {
-                                        case ViolationType.NoParking:
-                                            if (DateTime.Now.TimeOfDay >= regulation.StartTime &&
-                                                DateTime.Now.TimeOfDay <= regulation.EndTime)
-                                            {
-                                                Commentary.Print($"No Parkign Violation");
-                                                if (parkingEvent.EventType.Equals("PKOUT"))
-                                                {
-                                                    using (var innerContext = new PredixContext())
-                                                    {
-                                                        var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
-                                                            x.ObjectUid == parkingEvent.Properties.ObjectUid &&
-                                                            x.LocationUid == parkingEvent.LocationUid);
-                                                        if (inEvent?.ParkinTime != null)
-                                                        {
-                                                            inEvent.ExceedParkingLimit = true;
-                                                            inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
-                                                            inEvent.ViolationDuration = DateTime.Now.TimeOfDay
-                                                                .Subtract(inEvent.ParkinTime.Value).Minutes;
-                                                            inEvent.ExceedParkingLimit = true;
-                                                            inEvent.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                            inEvent.ModifiedDateTime = DateTime.UtcNow;
-                                                            innerContext.SaveChanges();
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-
-                                                isVoilation = true;
-                                                geViolation.NoParking = true;
-                                                geViolation.ObjectUid = parkingEvent.Properties.ObjectUid;
-                                                geViolation.LocationUid = parkingEvent.LocationUid;
-                                                if (parkingEvent.EventType.Equals("PKIN"))
-                                                {
-                                                    geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                    geViolation.ParkinTime = DateTime.Now.TimeOfDay;
-                                                }
-
-                                                if (parkingEvent.EventType.Equals("PKOUT"))
-                                                {
-                                                    geViolation.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                    geViolation.ParkoutTime = DateTime.Now.TimeOfDay;
-                                                }
-
-                                                geViolation.RegulationId = regulation.RegualationId;
-                                                geViolation.ViolationType = regulation.ViolationType;
-                                                context.GeViolations.Add(geViolation);
-                                            }
-
-                                            break;
-                                        case ViolationType.StreetSweeping:
-                                            if (DateTime.Now.TimeOfDay >= regulation.StartTime &&
-                                                DateTime.Now.TimeOfDay <= regulation.EndTime)
-                                            {
-                                                Commentary.Print($"*** StreetWeeping Violation");
-                                                if (parkingEvent.EventType.Equals("PKOUT"))
-                                                {
-                                                    using (var innerContext = new PredixContext())
-                                                    {
-                                                        var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
-                                                            x.ObjectUid == parkingEvent.Properties.ObjectUid &&
-                                                            x.LocationUid == parkingEvent.LocationUid);
-                                                        if (inEvent?.ParkinTime != null)
-                                                        {
-                                                            inEvent.ExceedParkingLimit = true;
-                                                            inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
-                                                            inEvent.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                            inEvent.ViolationDuration = DateTime.Now.TimeOfDay
-                                                                .Subtract(inEvent.ParkinTime.Value).Minutes;
-                                                            inEvent.ExceedParkingLimit = true;
-                                                            inEvent.ModifiedDateTime = DateTime.UtcNow;
-                                                            innerContext.SaveChanges();
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-
-                                                isVoilation = true;
-                                                geViolation.StreetSweeping = true;
-                                                geViolation.ObjectUid = parkingEvent.Properties.ObjectUid;
-                                                geViolation.LocationUid = parkingEvent.LocationUid;
-                                                if (parkingEvent.EventType.Equals("PKIN"))
-                                                {
-                                                    geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                    geViolation.ParkinTime = DateTime.Now.TimeOfDay;
-                                                }
-
-                                                if (parkingEvent.EventType.Equals("PKOUT"))
-                                                {
-                                                    geViolation.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                    geViolation.ParkoutTime = DateTime.Now.TimeOfDay;
-                                                }
-
-                                                geViolation.RegulationId = regulation.RegualationId;
-                                                geViolation.ViolationType = regulation.ViolationType;
-
-                                                context.GeViolations.Add(geViolation);
-                                            }
-
-                                            break;
-                                        case ViolationType.TimeLimitParking:
-                                            if (DateTime.Now.TimeOfDay >= regulation.StartTime &&
-                                                DateTime.Now.TimeOfDay <= regulation.EndTime &&
-                                                parkingEvent.EventType.Equals("PKIN"))
-                                            {
-                                                Commentary.Print($"*** Timelimit In Event");
-                                                isVoilation = true;
-
-                                                geViolation.ParkinTime = DateTime.Now.TimeOfDay;
-                                                geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                geViolation.ObjectUid = parkingEvent.Properties.ObjectUid;
-                                                geViolation.LocationUid = parkingEvent.LocationUid;
-
-                                                geViolation.RegulationId = regulation.RegualationId;
-                                                geViolation.ViolationType = regulation.ViolationType;
-
-                                                context.GeViolations.Add(geViolation);
-                                            }
-                                            else if (DateTime.Now.TimeOfDay >= regulation.StartTime &&
-                                                     DateTime.Now.TimeOfDay <= regulation.EndTime &&
-                                                     parkingEvent.EventType.Equals("PKOUT"))
-                                            {
-                                                isVoilation = true;
-                                                Commentary.Print($"*** Exceeded Time Limit Violation");
-                                                using (var innerContext = new PredixContext())
-                                                {
-                                                    var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
-                                                        x.ObjectUid == parkingEvent.Properties.ObjectUid &&
-                                                        x.LocationUid == parkingEvent.LocationUid);
-                                                    if (inEvent?.ParkinTime != null)
-                                                    {
-                                                        inEvent.ExceedParkingLimit = true;
-                                                        inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
-                                                        inEvent.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                        inEvent.ViolationDuration = DateTime.Now.TimeOfDay
-                                                            .Subtract(inEvent.ParkinTime.Value).Minutes;
-                                                        inEvent.ExceedParkingLimit = true;
-                                                        inEvent.ModifiedDateTime = DateTime.UtcNow;
-                                                        innerContext.SaveChanges();
-                                                    }
-                                                }
-                                            }
-
-                                            break;
-                                        case ViolationType.ReservedParking:
-                                            //This is out of scope for now, so we ae skipping this logic
-                                            break;
-                                        case ViolationType.FireHydrant:
-                                            Commentary.Print($"*** Fire Hydrant Violation");
-                                            if (parkingEvent.EventType.Equals("PKOUT"))
-                                            {
-                                                using (var innerContext = new PredixContext())
-                                                {
-                                                    var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
-                                                        x.ObjectUid == parkingEvent.Properties.ObjectUid &&
-                                                        x.LocationUid == parkingEvent.LocationUid);
-                                                    if (inEvent?.ParkinTime != null)
-                                                    {
-                                                        inEvent.ExceedParkingLimit = true;
-                                                        inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
-                                                        inEvent.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                        inEvent.ViolationDuration = DateTime.Now.TimeOfDay
-                                                            .Subtract(inEvent.ParkinTime.Value).Minutes;
-                                                        inEvent.ExceedParkingLimit = true;
-                                                        inEvent.ModifiedDateTime = DateTime.UtcNow;
-                                                        innerContext.SaveChanges();
-                                                        break;
-                                                    }
-                                                }
-                                            }
-
-                                            isVoilation = true;
-                                            geViolation.NoParking = true;
-                                            geViolation.ObjectUid = parkingEvent.Properties.ObjectUid;
-                                            geViolation.LocationUid = parkingEvent.LocationUid;
-                                            if (parkingEvent.EventType.Equals("PKIN"))
-                                            {
-                                                geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                geViolation.ParkinTime = DateTime.Now.TimeOfDay;
-                                            }
-
-                                            if (parkingEvent.EventType.Equals("PKOUT"))
-                                            {
-                                                geViolation.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
-                                                geViolation.ParkoutTime = DateTime.Now.TimeOfDay;
-                                            }
-
-                                            geViolation.RegulationId = regulation.RegualationId;
-                                            geViolation.ViolationType = regulation.ViolationType;
-
-                                            context.GeViolations.Add(geViolation);
-                                            break;
-                                    }
-                                }
-                                if(isVoilation)
-                                    break;
-                            }
-                        }
-
-                        context.SaveChanges();
-                    }
-
-                    if (!isVoilation && !options.SaveEvents) continue;
-                    Save(parkingEvent);
-                    if (isVoilation || options.SaveImages)
-                        imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid, parkingEvent.Timestamp);
+                    Task.Run(async () =>
+                            await ProcessEvent(imageService, options, customerId, response),
+                        cancellationTokenSource.Token).ConfigureAwait(false);
+                    //Task.Factory.StartNew(() => ProcessEvent(imageService, options, customerId, response), cancellationTokenSource.Token);
                 }
+
                 Commentary.Print($"WebSocket State:{clientWebSocket.State}");
+            }
+        }
+
+        private Task<bool> ProcessEvent(IImage imageService, Options options, int customerId, string response)
+        {
+            try
+            {
+                var jsonRespone = JsonConvert.DeserializeObject<JObject>(response);
+                ParkingEvent parkingEvent = jsonRespone != null
+                    ? (jsonRespone).ToObject<ParkingEvent>()
+                    : new ParkingEvent();
+                Commentary.Print($"Location ID :{parkingEvent.LocationUid}");
+                parkingEvent.CustomerId = customerId;
+                if (parkingEvent.Properties == null)
+                    parkingEvent.Properties = new ParkingEventProperties();
+                parkingEvent.Properties.LocationUid = parkingEvent.LocationUid;
+
+                if (options.MarkAllAsViolations)
+                {
+                    #region Temp Push all as violoations
+
+                    ForceMarkViolation(parkingEvent);
+                    Save(parkingEvent);
+                    imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid,
+                        parkingEvent.Timestamp);
+
+                    return Task.FromResult(true);
+
+                    #endregion
+                }
+
+                if (options.IgnoreRegulationCheck)
+                {
+                    Commentary.Print($"Skipping Regulation Check Alg", true);
+                    Save(parkingEvent);
+                    imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid,
+                        parkingEvent.Timestamp);
+
+                    return Task.FromResult(true);
+                }
+
+                var isVoilation = false;
+                using (var context = new PredixContext())
+                {
+                    var nodeMasterRegulations =
+                        context.NodeMasterRegulations.Include(x => x.ParkingRegulation).ToList();
+
+                    var nodeMasterRegulation =
+                        nodeMasterRegulations.Where(x => x.LocationUid == parkingEvent.LocationUid)
+                            .ToList();
+                    if (nodeMasterRegulation.Any())
+                    {
+                        var latLongs = parkingEvent.Properties.GeoCoordinates.Split(',').ToList();
+                        var parkingRegulations = new List<ParkingRegulation>();
+                        foreach (var regulation in nodeMasterRegulation)
+                        {
+                            ViolationPercentage(latLongs, regulation, parkingEvent);
+                            if (parkingEvent.MatchRate > 0)
+                                parkingRegulations.Add(regulation.ParkingRegulation);
+                        }
+
+                        foreach (var regulation in parkingRegulations)
+                        {
+                            if (regulation.DayOfWeek.Split('|')
+                                .Contains(DateTime.Now.DayOfWeek.ToString().Substring(0, 3)))
+                            {
+                                GeViolation geViolation = new GeViolation
+                                {
+                                    CreatedDateTime = DateTime.UtcNow
+                                };
+
+                                switch (regulation.ViolationType)
+                                {
+                                    case ViolationType.NoParking:
+                                        isVoilation = NoParkingCheck(regulation, parkingEvent, geViolation, context);
+                                        break;
+                                    case ViolationType.StreetSweeping:
+                                        isVoilation = IsStreetSweeping(regulation, parkingEvent, geViolation, context);
+                                        break;
+                                    case ViolationType.TimeLimitParking:
+                                        isVoilation = IsTimeLimitExceed(regulation, parkingEvent, geViolation, context);
+                                        break;
+                                    case ViolationType.ReservedParking:
+                                        //This is out of scope for now, so we ae skipping this logic
+                                        break;
+                                    case ViolationType.FireHydrant:
+                                        isVoilation = IsFireHydrant(parkingEvent, geViolation, regulation, context);
+                                        break;
+                                }
+                            }
+
+                            if (isVoilation)
+                                break;
+                        }
+                    }
+
+                    context.SaveChanges();
+                }
+
+                if (!isVoilation && !options.SaveEvents) return Task.FromResult(true);
+                Save(parkingEvent);
+                if (isVoilation || options.SaveImages)
+                    imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid,
+                        parkingEvent.Timestamp);
+                return Task.FromResult(false);
+            }
+            catch (Exception e)
+            {
+                Commentary.Print("******************************************");
+                Commentary.Print(e.ToString());
+                return Task.FromResult(false);
+            }
+        }
+
+        private static bool IsFireHydrant(ParkingEvent parkingEvent, GeViolation geViolation,
+            ParkingRegulation regulation, PredixContext context)
+        {
+            Commentary.Print($"*** Fire Hydrant Violation");
+            
+            if (parkingEvent.EventType.Equals("PKOUT"))
+            {
+                using (var innerContext = new PredixContext())
+                {
+                    var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
+                        x.ObjectUid == parkingEvent.Properties.ObjectUid &&
+                        x.LocationUid == parkingEvent.LocationUid);
+                    if (inEvent?.ParkinTime != null)
+                    {
+                        inEvent.ExceedParkingLimit = true;
+                        inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
+                        inEvent.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                        inEvent.ViolationDuration = DateTime.Now.TimeOfDay
+                            .Subtract(inEvent.ParkinTime.Value).Minutes;
+                        inEvent.ExceedParkingLimit = true;
+                        inEvent.ModifiedDateTime = DateTime.UtcNow;
+                        innerContext.SaveChanges();
+                        return false;
+                    }
+                }
+            }
+
+            geViolation.NoParking = true;
+            geViolation.ObjectUid = parkingEvent.Properties.ObjectUid;
+            geViolation.LocationUid = parkingEvent.LocationUid;
+            if (parkingEvent.EventType.Equals("PKIN"))
+            {
+                geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                geViolation.ParkinTime = DateTime.Now.TimeOfDay;
+            }
+
+            if (parkingEvent.EventType.Equals("PKOUT"))
+            {
+                geViolation.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                geViolation.ParkoutTime = DateTime.Now.TimeOfDay;
+            }
+
+            geViolation.RegulationId = regulation.RegualationId;
+            geViolation.ViolationType = regulation.ViolationType;
+
+            context.GeViolations.Add(geViolation);
+            return true;
+        }
+
+        private static bool IsTimeLimitExceed(ParkingRegulation regulation, ParkingEvent parkingEvent,
+            GeViolation geViolation, PredixContext context)
+        {
+            bool isVoilation = false;
+            if (DateTime.Now.TimeOfDay >= regulation.StartTime &&
+                DateTime.Now.TimeOfDay <= regulation.EndTime &&
+                parkingEvent.EventType.Equals("PKIN"))
+            {
+                Commentary.Print($"*** Timelimit In Event");
+                isVoilation = true;
+
+                geViolation.ParkinTime = DateTime.Now.TimeOfDay;
+                geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                geViolation.ObjectUid = parkingEvent.Properties.ObjectUid;
+                geViolation.LocationUid = parkingEvent.LocationUid;
+
+                geViolation.RegulationId = regulation.RegualationId;
+                geViolation.ViolationType = regulation.ViolationType;
+
+                context.GeViolations.Add(geViolation);
+            }
+            else if (DateTime.Now.TimeOfDay >= regulation.StartTime &&
+                     DateTime.Now.TimeOfDay <= regulation.EndTime &&
+                     parkingEvent.EventType.Equals("PKOUT"))
+            {
+                isVoilation = true;
+                Commentary.Print($"*** Exceeded Time Limit Violation");
+                using (var innerContext = new PredixContext())
+                {
+                    var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
+                        x.ObjectUid == parkingEvent.Properties.ObjectUid &&
+                        x.LocationUid == parkingEvent.LocationUid);
+                    if (inEvent?.ParkinTime != null)
+                    {
+                        inEvent.ExceedParkingLimit = true;
+                        inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
+                        inEvent.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                        inEvent.ViolationDuration = DateTime.Now.TimeOfDay
+                            .Subtract(inEvent.ParkinTime.Value).Minutes;
+                        inEvent.ExceedParkingLimit = true;
+                        inEvent.ModifiedDateTime = DateTime.UtcNow;
+                        innerContext.SaveChanges();
+                    }
+                }
+            }
+
+            return isVoilation;
+        }
+
+        private static bool IsStreetSweeping(ParkingRegulation regulation, ParkingEvent parkingEvent, 
+            GeViolation geViolation, PredixContext context)
+        {
+            bool isVoilation = false;
+            if (DateTime.Now.TimeOfDay >= regulation.StartTime &&
+                DateTime.Now.TimeOfDay <= regulation.EndTime)
+            {
+                Commentary.Print($"*** StreetWeeping Violation");
+                if (parkingEvent.EventType.Equals("PKOUT"))
+                {
+                    using (var innerContext = new PredixContext())
+                    {
+                        var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
+                            x.ObjectUid == parkingEvent.Properties.ObjectUid &&
+                            x.LocationUid == parkingEvent.LocationUid);
+                        if (inEvent?.ParkinTime != null)
+                        {
+                            inEvent.ExceedParkingLimit = true;
+                            inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
+                            inEvent.EventOutDateTime =
+                                EpochToDateTime(parkingEvent.Timestamp);
+                            inEvent.ViolationDuration = DateTime.Now.TimeOfDay
+                                .Subtract(inEvent.ParkinTime.Value).Minutes;
+                            inEvent.ExceedParkingLimit = true;
+                            inEvent.ModifiedDateTime = DateTime.UtcNow;
+                            innerContext.SaveChanges();
+                            return false;
+                        }
+                    }
+                }
+
+                isVoilation = true;
+                geViolation.StreetSweeping = true;
+                geViolation.ObjectUid = parkingEvent.Properties.ObjectUid;
+                geViolation.LocationUid = parkingEvent.LocationUid;
+                if (parkingEvent.EventType.Equals("PKIN"))
+                {
+                    geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                    geViolation.ParkinTime = DateTime.Now.TimeOfDay;
+                }
+
+                if (parkingEvent.EventType.Equals("PKOUT"))
+                {
+                    geViolation.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                    geViolation.ParkoutTime = DateTime.Now.TimeOfDay;
+                }
+
+                geViolation.RegulationId = regulation.RegualationId;
+                geViolation.ViolationType = regulation.ViolationType;
+
+                context.GeViolations.Add(geViolation);
+            }
+
+            return isVoilation;
+        }
+
+        private static bool NoParkingCheck(ParkingRegulation regulation, ParkingEvent parkingEvent,
+            GeViolation geViolation, PredixContext context)
+        {
+            bool isVoilation = false;
+            if (DateTime.Now.TimeOfDay >= regulation.StartTime &&
+                DateTime.Now.TimeOfDay <= regulation.EndTime)
+            {
+                Commentary.Print($"No Parkign Violation");
+                if (parkingEvent.EventType.Equals("PKOUT"))
+                {
+                    using (var innerContext = new PredixContext())
+                    {
+                        var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
+                            x.ObjectUid == parkingEvent.Properties.ObjectUid &&
+                            x.LocationUid == parkingEvent.LocationUid);
+                        if (inEvent?.ParkinTime != null)
+                        {
+                            inEvent.ExceedParkingLimit = true;
+                            inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
+                            inEvent.ViolationDuration = DateTime.Now.TimeOfDay
+                                .Subtract(inEvent.ParkinTime.Value).Minutes;
+                            inEvent.ExceedParkingLimit = true;
+                            inEvent.EventOutDateTime =
+                                EpochToDateTime(parkingEvent.Timestamp);
+                            inEvent.ModifiedDateTime = DateTime.UtcNow;
+                            innerContext.SaveChanges();
+                            return false;
+                        }
+                    }
+                }
+
+                isVoilation = true;
+                geViolation.NoParking = true;
+                geViolation.ObjectUid = parkingEvent.Properties.ObjectUid;
+                geViolation.LocationUid = parkingEvent.LocationUid;
+                if (parkingEvent.EventType.Equals("PKIN"))
+                {
+                    geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                    geViolation.ParkinTime = DateTime.Now.TimeOfDay;
+                }
+
+                if (parkingEvent.EventType.Equals("PKOUT"))
+                {
+                    geViolation.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                    geViolation.ParkoutTime = DateTime.Now.TimeOfDay;
+                }
+
+                geViolation.RegulationId = regulation.RegualationId;
+                geViolation.ViolationType = regulation.ViolationType;
+                context.GeViolations.Add(geViolation);
+            }
+
+            return isVoilation;
+        }
+
+        private static void ViolationPercentage(List<string> latLongs, NodeMasterRegulation regulation, ParkingEvent parkingEvent)
+        {
+            foreach (var latLong in latLongs)
+            {
+                if (IsPointInPolygon4(new List<PointF>
+                    {
+                        new PointF(
+                            float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[0]),
+                            float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[1])),
+                        new PointF(
+                            float.Parse(regulation.ParkingRegulation.Coodrinate2.Split(':')[0]),
+                            float.Parse(regulation.ParkingRegulation.Coodrinate2.Split(':')[1])),
+                        new PointF(
+                            float.Parse(regulation.ParkingRegulation.Coodrinate3.Split(':')[0]),
+                            float.Parse(regulation.ParkingRegulation.Coodrinate3.Split(':')[1])),
+                        new PointF(
+                            float.Parse(regulation.ParkingRegulation.Coodrinate4.Split(':')[0]),
+                            float.Parse(regulation.ParkingRegulation.Coodrinate4.Split(':')[1]))
+                    }.ToArray(),
+                    new PointF(float.Parse(latLong.Split(':')[0]),
+                        float.Parse(latLong.Split(':')[1]))))
+                {
+                    parkingEvent.MatchRate += 25;
+                }
+            }
+        }
+
+        private static void ForceMarkViolation(ParkingEvent parkingEvent)
+        {
+            Commentary.Print("Force Mark Violation");
+            if (parkingEvent.EventType.Equals("PKOUT"))
+            {
+                using (var innerContext = new PredixContext())
+                {
+                    var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
+                        x.ObjectUid == parkingEvent.Properties.ObjectUid &&
+                        x.LocationUid == parkingEvent.LocationUid);
+                    if (inEvent?.ParkinTime != null)
+                    {
+                        inEvent.ExceedParkingLimit = true;
+                        inEvent.ParkoutTime = DateTime.Now.TimeOfDay;
+                        inEvent.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                        inEvent.ViolationDuration = DateTime.Now.TimeOfDay
+                            .Subtract(inEvent.ParkinTime.Value).Minutes;
+                        inEvent.ExceedParkingLimit = true;
+                        inEvent.ModifiedDateTime = DateTime.UtcNow;
+                        innerContext.SaveChanges();
+                        return;
+                    }
+                }
+            }
+
+            GeViolation geViolation = new GeViolation
+            {
+                NoParking = true,
+                ObjectUid = parkingEvent.Properties.ObjectUid,
+                LocationUid = parkingEvent.LocationUid
+            };
+            if (parkingEvent.EventType.Equals("PKIN"))
+            {
+                geViolation.EventInDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                geViolation.ParkinTime = DateTime.Now.TimeOfDay;
+            }
+
+            if (parkingEvent.EventType.Equals("PKOUT"))
+            {
+                geViolation.EventOutDateTime = EpochToDateTime(parkingEvent.Timestamp);
+                geViolation.ParkoutTime = DateTime.Now.TimeOfDay;
+            }
+
+            geViolation.RegulationId = 81;
+            geViolation.ViolationType = ViolationType.FireHydrant;
+            using (var context = new PredixContext())
+            {
+                context.GeViolations.Add(geViolation);
+                context.SaveChanges();
             }
         }
 
