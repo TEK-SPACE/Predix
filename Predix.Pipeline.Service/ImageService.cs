@@ -108,7 +108,15 @@ namespace Predix.Pipeline.Service
                 return bmpReturn;
             }
         }
-
+        private static DateTime? EpochToDateTime(string epoch)
+        {
+            if (string.IsNullOrWhiteSpace(epoch))
+                return null;
+            return DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(epoch)).DateTime;
+            //System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            //dtDateTime = dtDateTime.AddSeconds(Convert.ToInt64(epoch)).ToLocalTime();
+            //return dtDateTime;
+        }
         public Image MarkPixelCoordinates(ParkingEvent parkingEvent, Image image)
         {
             try
@@ -157,10 +165,10 @@ namespace Predix.Pipeline.Service
                             {
                                 $"Event Id: {parkingEvent.Id}",
                                 $"In or Out: {parkingEvent.EventType}",
-                                $"Timestamp: {parkingEvent.Timestamp} {parkingEvent.EventTime?.ToString("F")}",
-                                $"Location Uid: {parkingEvent.LocationUid}",
-                                $"Asset Uid: {parkingEvent.AssetUid}",
-                                $"Pixel Coordinates {parkingEvent.Properties.PixelCoordinates}"
+                                $"Local Time: {parkingEvent.Timestamp.ToUtcDateTimeOrNull()} {parkingEvent.EventTime?.ToString("F")}"
+                                //$"Location Uid: {parkingEvent.LocationUid}",
+                                //$"Asset Uid: {parkingEvent.AssetUid}",
+                                //$"Pixel Coordinates {parkingEvent.Properties.PixelCoordinates}"
                             };
                             foreach (var writing in writings)
                             {

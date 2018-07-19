@@ -45,12 +45,12 @@ namespace Predix.Domain.Model
         /// <summary>
         /// Event In Time
         /// </summary>
-        public TimeSpan? ParkinTime { get; set; }
+        public DateTime? ParkinTime { get; set; }
 
         /// <summary>
         /// Event Out Time
         /// </summary>
-        public TimeSpan? ParkoutTime { get; set; }
+        public DateTime? ParkoutTime { get; set; }
 
         /// <summary>
         /// Duration in Minutes
@@ -97,5 +97,7 @@ namespace Predix.Domain.Model
         [Column(TypeName = "nvarchar")]
         [StringLength(200)]
         public string UserId { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }
