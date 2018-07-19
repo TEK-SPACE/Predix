@@ -155,7 +155,7 @@ namespace Predix.Pipeline.Service
                             ViolationPercentage(latLongs, regulation, parkingEvent);
                             if (parkingEvent.MatchRate > 0)
                                 parkingRegulations.Add(regulation.ParkingRegulation);
-                            Commentary.Print($"Parking Event Id: {parkingEvent.Id} Match Rate {parkingEvent.MatchRate}",
+                            Commentary.Print($"Regulation Id: {regulation.Id}, Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Match Rate {parkingEvent.MatchRate}",
                                 true);
                         }
 
@@ -169,17 +169,17 @@ namespace Predix.Pipeline.Service
                                 switch (regulation.ViolationType)
                                 {
                                     case ViolationType.NoParking:
-                                        Commentary.Print($"Parking Event Id: {parkingEvent.Id} Checking No Parking",
+                                        Commentary.Print($"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Checking No Parking",
                                             true);
                                         isVoilation = NoParkingCheck(regulation, parkingEvent, geViolation, context);
                                         break;
                                     case ViolationType.StreetSweeping:
-                                        Commentary.Print($"Parking Event Id: {parkingEvent.Id} Checking Street Sweeping",
+                                        Commentary.Print($"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Checking Street Sweeping",
                                             true);
                                         isVoilation = IsStreetSweeping(regulation, parkingEvent, geViolation, context);
                                         break;
                                     case ViolationType.TimeLimitParking:
-                                        Commentary.Print($"Parking Event Id: {parkingEvent.Id} Checking Time Limit",
+                                        Commentary.Print($"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Checking Time Limit",
                                             true);
                                         isVoilation = IsTimeLimitExceed(regulation, parkingEvent, geViolation, context);
                                         break;
@@ -187,12 +187,12 @@ namespace Predix.Pipeline.Service
                                         //This is out of scope for now, so we ae skipping this logic
                                         break;
                                     case ViolationType.FireHydrant:
-                                        Commentary.Print($"Parking Event Id: {parkingEvent.Id} Fire Hydrant",
+                                        Commentary.Print($"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Fire Hydrant",
                                             true);
                                         isVoilation = IsFireHydrant(parkingEvent, geViolation, regulation, context);
                                         break;
                                 }
-                                Commentary.Print($"Parking Event Id: {parkingEvent.Id}, Is Violation: {isVoilation}",
+                                Commentary.Print($"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Is Violation: {isVoilation}",
                                     true);
                             }
 
