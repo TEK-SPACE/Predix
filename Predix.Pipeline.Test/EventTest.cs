@@ -21,7 +21,8 @@ namespace Predix.Pipeline.Test
         [TestCase("LOCATION-225", "PKIN", 4120)]
         public void GetWebSocketTest(string locationUid, string eventType, int customerId)
         {
-            _eventService.GetByLocation(locationUid, eventType,new ImageService(new Dictionary<string, object>()),new Options(), customerId);
+            _eventService.GetByLocation(locationUid, eventType, new ImageService(new Dictionary<string, object>()),
+                new Options(), new Customer() {Id = customerId});
             //Assert.IsNotNull(details);
             //Assert.AreSame(new ParkingEvent(), details);
         }

@@ -36,21 +36,29 @@ namespace Predix.Pipeline.Helper
             }
             //Console.WriteLine();
 
-            using (PredixContext context = new PredixContext())
+            try
             {
-                var activity = new Activity
+                using (PredixContext context = new PredixContext())
                 {
-                    ProcessDateTime = DateTime.Now,
-                    RequestJson = request.Content?.ReadAsStringAsync().Result,
-                    ResponseJson = response.Content?.ReadAsStringAsync().Result,
-                    Type = request.Method.Method.Equals("get", StringComparison.OrdinalIgnoreCase)
-                        ? ActivityType.Get
-                        : ActivityType.Post
-                };
-                context.Activities.Add(activity);
-                context.SaveChanges();
-                ActivityId = activity.Id;
+                    var activity = new Activity
+                    {
+                        ProcessDateTime = DateTime.Now,
+                        RequestJson = request.Content?.ReadAsStringAsync().Result,
+                        ResponseJson = response.Content?.ReadAsStringAsync().Result,
+                        Type = request.Method.Method.Equals("get", StringComparison.OrdinalIgnoreCase)
+                            ? ActivityType.Get
+                            : ActivityType.Post
+                    };
+                    context.Activities.Add(activity);
+                    await context.SaveChangesAsync(cancellationToken);
+                    ActivityId = activity.Id;
+                }
             }
+            catch (Exception e)
+            {
+                Commentary.Print($"Failed to log the activity: {e.Message}", true);
+            }
+            
             return response;
         }
     }

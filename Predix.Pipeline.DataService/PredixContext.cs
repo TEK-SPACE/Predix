@@ -24,6 +24,8 @@ namespace Predix.Pipeline.DataService
 
         public DbSet<Location> Locations { get; set; }
         public DbSet<LocationDetails> LocationDetails { get; set; }
+        public DbSet<LocationDetailsExtended> LocationDetailsExtendeds { get; set; }
+
 
         public DbSet<ParkingEvent> ParkingEvents { get; set; }
         public DbSet<ParkingEventProperties> ParkingEventProperties { get; set; }

@@ -14,10 +14,10 @@ namespace Predix.Pipeline.Helper
             return dtDateTime;
         }
 
-        public static DateTime ToEst(this DateTime utcDateTime)
+        public static DateTime ToTimeZone(this DateTime utcDateTime, string zoneId)
         {
             if (utcDateTime.Kind != DateTimeKind.Utc) throw new Exception("dateTime needs to have Kind property set to Utc");
-            var toUtcOffset = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time").GetUtcOffset(utcDateTime);
+            var toUtcOffset = TimeZoneInfo.FindSystemTimeZoneById(zoneId).GetUtcOffset(utcDateTime);
             var convertedTime = DateTime.SpecifyKind(utcDateTime.Add(toUtcOffset), DateTimeKind.Unspecified);
             return new DateTimeOffset(convertedTime, toUtcOffset).DateTime;
 

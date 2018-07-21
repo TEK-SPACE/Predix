@@ -63,6 +63,7 @@
     <Compile Include="Constant\Endpoint.cs" />
     <Compile Include="Constant\GeorgiaPowerAtlantaEndpoints.cs" />
     <Compile Include="Constant\StagingEndpoints.cs" />
+    <Compile Include="Customer.cs" />
     <Compile Include="Enum\ActivityType.cs" />
     <Compile Include="Enum\ViolationType.cs" />
     <Compile Include="GeViolation.cs" />
@@ -71,12 +72,12 @@
     <Compile Include="Location\Location.cs" />
     <Compile Include="Location\LocationDetailProperties.cs" />
     <Compile Include="Location\LocationDetails.cs" />
+    <Compile Include="Location\LocationDetailsExtended.cs" />
     <Compile Include="Location\Media.cs" />
     <Compile Include="Location\ParkingEvent.cs" />
     <Compile Include="Location\ParkingEventProperties.cs" />
     <Compile Include="Location\Measures.cs" />
     <Compile Include="Location\Violation.cs" />
-    <Compile Include="NodeMaster.cs" />
     <Compile Include="NodeMasterRegulation.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="ParkingRegulation.cs" />

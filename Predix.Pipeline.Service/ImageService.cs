@@ -205,6 +205,7 @@ namespace Predix.Pipeline.Service
                             fs.Write(bytes, 0, bytes.Length);
                             image.Base64 = image.Base64.Split(',').ToList<string>()[0] + "," +
                                            Convert.ToBase64String(bytes);
+                            image.ImagePath = fileName.Replace($"{randomTempFileName}CivicSmart", "");
                         }
                     }
                 }

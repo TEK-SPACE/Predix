@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Predix.Domain.Model;
@@ -40,7 +39,7 @@ namespace Predix.Pipeline.Service
             }
             return details;
         }
-        public void GetByBoundaryAsync(string bbox, string eventType1, string eventType2, IImage imageService, Options options, int customerId)
+        public void GetByBoundaryAsync(string bbox, string eventType1, string eventType2, IImage imageService, Options options, Customer customer)
         {
             //ParkingEvent parkingEvent = null;
             Dictionary<string, string> additionalHeaders =
@@ -49,7 +48,7 @@ namespace Predix.Pipeline.Service
             while (true)
             {
                 _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders,
-                    imageService, options, customerId);
+                    imageService, options, customer);
             }
 
             //if (!string.IsNullOrWhiteSpace(response.Result))
@@ -63,13 +62,13 @@ namespace Predix.Pipeline.Service
             //return parkingEvent;
             // ReSharper disable once FunctionNeverReturns
         }
-        public void GetByLocation(string locationUid, string eventType, IImage imageService,Options options, int customerId)
+        public void GetByLocation(string locationUid, string eventType, IImage imageService,Options options, Customer customer)
         {
             ParkingEvent parkingEvent = null;
             Dictionary<string, string> additionalHeaders =
                 new Dictionary<string, string> { { "predix-zone-id", Endpoint.PredixZoneIdForParking } };
             string bodyMessage = $"{{\"locationUid\":\"{locationUid}\",\"eventTypes\":[\"{eventType}\"]}}";
-             _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders, imageService, options, customerId: customerId);
+             _predixWebSocketClient.OpenAsync(Endpoint.WebSocketUrlForEvents, bodyMessage, additionalHeaders, imageService, options, customer: customer);
             //if (!string.IsNullOrWhiteSpace(response.Result))
             //{
             //    var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);

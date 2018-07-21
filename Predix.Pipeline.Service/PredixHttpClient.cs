@@ -52,6 +52,7 @@ namespace Predix.Pipeline.Service
         public async Task<string> GetFile(string url, Dictionary<string, string> additionalHeaders)
         {
             Commentary.Print($"Fething Image Base64", true);
+            Commentary.Print($"Image URL: {url}", true);
             _securityService.SetClientToken().Wait();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
                                                    SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;

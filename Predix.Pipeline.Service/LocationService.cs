@@ -29,7 +29,7 @@ namespace Predix.Pipeline.Service
             int pageNumber = 0;
             int totalPages = 1;
             Dictionary<string, string> additionalHeaders =
-                new Dictionary<string, string> {{"Predix-Zone-Id", Endpoint.PredixZoneIdForParking } };
+                new Dictionary<string, string> {{"Predix-Zone-Id", Endpoint.PredixZoneIdForParking}};
             while (totalPages - 1 >= pageNumber)
             {
                 var response = _predixHttpClient.GetAllAsync(Endpoint.GetListOfLocation
@@ -42,11 +42,12 @@ namespace Predix.Pipeline.Service
                 var locations = jsonRespone["content"] != null
                     ? ((JArray) jsonRespone["content"]).ToObject<List<Location>>()
                     : new List<Location>();
-                SaveLocationKeys(locations);
                 locationList.AddRange(locations);
                 totalPages = jsonRespone["totalPages"] != null ? (int) jsonRespone["totalPages"] : 0;
                 pageNumber++;
             }
+
+            SaveLocationKeys(locationList);
             return locationList;
         }
 

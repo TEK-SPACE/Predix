@@ -56,7 +56,7 @@ namespace Predix.Pipeline.UI
                 }
 
                 _eventService.GetByBoundaryAsync(boundary.Range, "PKIN", "PKOUT", _imageService, options,
-                    boundary.CustomerId);
+                    new Customer(){Id = boundary.CustomerId });
             }
 
             Commentary.Print($"Completed. Please enter a key to exit");

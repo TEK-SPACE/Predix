@@ -9,6 +9,7 @@ namespace Predix.Domain.Model.Location
     {
         //[JsonIgnore]
         //public int Id { get; set; }
+     
         /// <summary>
         /// <para>A unique identifier established by a customer or external resource for a specific location within the monitored area. For example, LOCATION-STG-323.</para>
         /// </summary>
@@ -16,6 +17,10 @@ namespace Predix.Domain.Model.Location
         [Key]
         [StringLength(250)]
         public string LocationUid { get; set; }
+
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
         /// <summary>
         /// <para>CITIES: Insert the following enumeration codes for a specific location type for CITIES</para>
         /// <para>PARKING_SPOT: PARKING_SPOT consists of demarcated parking spaces within the defined boundaries(Not applicable in v2).</para>
