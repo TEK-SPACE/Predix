@@ -81,7 +81,7 @@ namespace Predix.Pipeline.WinService
                     _locationService.Details(locations.Select(x => x.LocationUid).Distinct().ToList());
                 }
 
-                _eventService.GetByBoundaryAsync(boundary.Range, "PKIN", "PKOUT", _imageService, options, new Customer{Id = boundary.CustomerId, TimrzoneId = "Eastern Standard Time" });
+                _eventService.GetByBoundaryAsync(boundary.Range, "PKIN", "PKOUT", _imageService, options, new Customer{Id = boundary.CustomerId, TimezoneId = "Eastern Standard Time" });
             }
 
             Commentary.Print($"Completed. Please enter a key to exit");

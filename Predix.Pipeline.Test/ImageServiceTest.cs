@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Predix.Domain.Model;
 using Predix.Domain.Model.Location;
 using Predix.Pipeline.Interface;
 using Predix.Pipeline.Service;
@@ -23,7 +24,7 @@ namespace Predix.Pipeline.Test
         {
 
             _imageService.MediaOnDemand(new ParkingEvent {Properties = new ParkingEventProperties {Id = propertyId}},
-                imageAssetUid, timestamp);
+                imageAssetUid, timestamp, new Customer());
         }
 
         [Test]
@@ -41,7 +42,7 @@ namespace Predix.Pipeline.Test
                     new Image
                     {
                         Base64 = image.Item3
-                    });
+                    }, new Customer());
             }
 
             //_imageService.MarkPixelCoordinates(

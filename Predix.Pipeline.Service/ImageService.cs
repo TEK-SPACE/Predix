@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Predix.Domain.Model;
 using Predix.Domain.Model.Constant;
 using Predix.Domain.Model.Location;
 using Predix.Pipeline.DataService;
@@ -27,7 +28,7 @@ namespace Predix.Pipeline.Service
             _globalVariables = globalVariables;
         }
 
-        public void MediaOnDemand(ParkingEvent parkingEvent, string imageAssetUid, string timestamp)
+        public void MediaOnDemand(ParkingEvent parkingEvent, string imageAssetUid, string timestamp, Customer customer)
         {
             var media = GetMedia(imageAssetUid, timestamp);
             Image image = new Image { PropertyId = parkingEvent.Properties.Id };
@@ -70,7 +71,7 @@ namespace Predix.Pipeline.Service
                     into response
                                    select response.Result).FirstOrDefault();
                 image.Base64 = imageBinary;
-                image = MarkPixelCoordinates(parkingEvent: parkingEvent, image: image);
+                image = MarkPixelCoordinates(parkingEvent: parkingEvent, image: image, customer:customer);
             }
             if (image == null) return;
             image.PropertyId = parkingEvent.Properties.Id;
@@ -117,7 +118,7 @@ namespace Predix.Pipeline.Service
             //dtDateTime = dtDateTime.AddSeconds(Convert.ToInt64(epoch)).ToLocalTime();
             //return dtDateTime;
         }
-        public Image MarkPixelCoordinates(ParkingEvent parkingEvent, Image image)
+        public Image MarkPixelCoordinates(ParkingEvent parkingEvent, Image image, Customer customer)
         {
             try
             {
@@ -165,7 +166,7 @@ namespace Predix.Pipeline.Service
                             {
                                 $"Event Id: {parkingEvent.Id}",
                                 $"In or Out: {parkingEvent.EventType}",
-                                $"Local Time: {parkingEvent.Timestamp.ToUtcDateTimeOrNull()} {parkingEvent.EventTime?.ToString("F")}"
+                                $"Local Time: {parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId)} {parkingEvent.EventTime?.ToString("F")}"
                                 //$"Location Uid: {parkingEvent.LocationUid}",
                                 //$"Asset Uid: {parkingEvent.AssetUid}",
                                 //$"Pixel Coordinates {parkingEvent.Properties.PixelCoordinates}"

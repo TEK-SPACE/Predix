@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
 
-        public string TimrzoneId { get; set; }
+        public string TimezoneId { get; set; }
     }
 }

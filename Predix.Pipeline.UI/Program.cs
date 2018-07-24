@@ -56,7 +56,7 @@ namespace Predix.Pipeline.UI
                 }
 
                 _eventService.GetByBoundaryAsync(boundary.Range, "PKIN", "PKOUT", _imageService, options,
-                    new Customer(){Id = boundary.CustomerId });
+                    new Customer(){Id = boundary.CustomerId, TimezoneId = "Eastern Standard Time" });
             }
 
             Commentary.Print($"Completed. Please enter a key to exit");
