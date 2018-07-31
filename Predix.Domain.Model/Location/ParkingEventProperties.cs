@@ -10,6 +10,11 @@ namespace Predix.Domain.Model.Location
         [JsonIgnore]
         [Key]
         public int Id { get; set; }
+
+       
+        [JsonProperty(PropertyName = "orgPixelCoordinates")]
+        public string OrgPixelCoordinates { get; set; }
+
         /// <summary>
         /// Local coordinates of the identified vehicle in the image. The coordinates of the four corners of the vehicle are provided.
         /// </summary>

@@ -13,21 +13,21 @@ using Predix.Pipeline.Service;
 
 namespace Predix.Pipeline.WinService
 {
-    public partial class PredixPipelineService : ServiceBase
+    public partial class PredixRealTimeService : ServiceBase
     {
         private static ILocation _locationService;
         private static IEvent _eventService;
         private static IImage _imageService;
         private static readonly Dictionary<string, object> GlobalVariables = new Dictionary<string, object>();
 
-        public PredixPipelineService()
+        public PredixRealTimeService()
         {
             InitializeComponent();
         }
 
         protected override void OnStart(string[] args)
         {
-            Commentary.Print("Service is Started");
+            Commentary.Print("RTE Service is Started");
 
             Commentary.WriteToFile = true;
             _locationService = new LocationService(GlobalVariables);
@@ -40,7 +40,7 @@ namespace Predix.Pipeline.WinService
 
         protected override void OnStop()
         {
-            Commentary.Print("Service is Stoped");
+            Commentary.Print("RTA Service is Stoped");
         }
 
 

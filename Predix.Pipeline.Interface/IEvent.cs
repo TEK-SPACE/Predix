@@ -34,9 +34,9 @@ namespace Predix.Pipeline.Interface
         /// </summary>
         /// <param name="locationUid"></param>
         /// <param name="eventType"></param>
-        /// <param name="startDate"></param>
-        /// <param name="endTime"></param>
+        /// <param name="epochStartTime"></param>
+        /// <param name="epochEndTime"></param>
         /// <returns></returns>
-        List<ParkingEvent> Get(string locationUid, string eventType, DateTime startDate, DateTime endTime);
+        List<ParkingEvent> Get(string locationUid, string eventType, string epochStartTime, string epochEndTime);
     }
 }

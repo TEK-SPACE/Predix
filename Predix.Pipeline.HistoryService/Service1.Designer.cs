@@ -1,6 +1,6 @@
-﻿namespace Predix.Pipeline.WinService
+﻿namespace Predix.Pipeline.HistoryService
 {
-    partial class PredixRealTimeService
+    partial class PredixHistoryService
     {
         /// <summary> 
         /// Required designer variable.
@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             // 
-            // PredixRealTimeService
+            // PredixHistoryService
             // 
-            this.ServiceName = "PredixRealTimeService";
+            this.ServiceName = "PredixHistoryService";
 
         }
 

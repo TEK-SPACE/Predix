@@ -12,25 +12,32 @@ namespace Predix.Pipeline.Helper
 
         public static void Print(string message, bool tabSpace = false)
         {
-            var printMessage = tabSpace
-                ? $"\t{DateTime.Now:G} => {message}"
-                : $"{DateTime.Now:G} => {message}";
-            Console.WriteLine(printMessage);
-            if (!Directory.Exists(Path.Combine(Utility.ActiveBin, "logs")))
-                Directory.CreateDirectory(Path.Combine(Utility.ActiveBin, "logs"));
-            if (!WriteToFile) return;
-            if (!File.Exists(FilePath))
+            try
             {
-                using (var filestream = File.Create(FilePath))
+                var printMessage = tabSpace
+                    ? $"\t{DateTime.Now:G} => {message}"
+                    : $"{DateTime.Now:G} => {message}";
+                Console.WriteLine(printMessage);
+                if (!Directory.Exists(Path.Combine(Utility.ActiveBin, "logs")))
+                    Directory.CreateDirectory(Path.Combine(Utility.ActiveBin, "logs"));
+                if (!WriteToFile) return;
+                if (!File.Exists(FilePath))
                 {
-                    filestream.Close();
+                    using (var filestream = File.Create(FilePath))
+                    {
+                        filestream.Close();
+                    }
+                }
+
+                using (var streamWriter = File.AppendText(FilePath))
+                {
+                    streamWriter.WriteLine(printMessage);
+                    streamWriter.Close();
                 }
             }
-
-            using (var streamWriter = File.AppendText(FilePath))
+            catch (Exception e)
             {
-                streamWriter.WriteLine(printMessage);
-                streamWriter.Close();
+                Console.WriteLine(e);
             }
         }
     }

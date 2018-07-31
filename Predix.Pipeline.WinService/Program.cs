@@ -11,7 +11,7 @@ namespace Predix.Pipeline.WinService
         {
             var servicesToRun = new ServiceBase[]
             {
-                new PredixPipelineService()
+                new PredixRealTimeService()
             };
             ServiceBase.Run(servicesToRun);
         }

@@ -20,24 +20,21 @@ namespace Predix.Pipeline.Service
             _globalVariables = globalVariables;
         }
         private readonly IPredixWebSocketClient _predixWebSocketClient = new PredixWebSocketClient();
-        public List<ParkingEvent> Get(string locationUid, string eventType, DateTime startDate, DateTime endTime)
+        public List<ParkingEvent> Get(string locationUid, string eventType, string epochStartTime, string epochEndTime)
         {
-            List<ParkingEvent> details = new List<ParkingEvent>();
             Dictionary<string, string> additionalHeaders =
-                new Dictionary<string, string> { { "predix-zone-id", "SDSIM-IE-PARKING" } };
-            var response = _predixHttpClient.GetAllAsync(Endpoint.PkInPkOutByLocationId
-                .Replace("{parking_loc}", locationUid)
-                .Replace("{parkInOrOut}", eventType)
-                .Replace("{startTimeInEpoch}", startDate.ToEpoch().ToString())
-                .Replace("{endTimeInEpoch}", endTime.ToEpoch().ToString()), additionalHeaders);
-            if (!string.IsNullOrWhiteSpace(response.Result))
-            {
-                var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
-                details.AddRange(jsonRespone["content"] != null
-                    ? ((JArray)jsonRespone["content"]).ToObject<List<ParkingEvent>>()
-                    : new List<ParkingEvent>());
-            }
-            return details;
+                new Dictionary<string, string> { { "Predix-Zone-Id", Endpoint.PredixZoneIdForParking } };
+            var response = _predixHttpClient.GetAllAsync(Endpoint.GetEventsByLocation
+                   .Replace("{locationUid}", locationUid)
+                   .Replace("{eventType}", eventType)
+                   .Replace("{epochStartTime}", epochStartTime + "000")
+                   .Replace("{epochEndTime}", epochEndTime + "000"), additionalHeaders);
+            if (string.IsNullOrWhiteSpace(response.Result))
+                return new List<ParkingEvent>();
+
+            var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
+            var parkingEvents = jsonRespone["content"].ToObject<List<ParkingEvent>>();
+            return parkingEvents;
         }
         public void GetByBoundaryAsync(string bbox, string eventType1, string eventType2, IImage imageService, Options options, Customer customer)
         {

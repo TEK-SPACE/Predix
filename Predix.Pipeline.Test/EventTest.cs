@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using Predix.Domain.Model;
 using Predix.Domain.Model.Location;
+using Predix.Pipeline.Helper;
 using Predix.Pipeline.Interface;
 using Predix.Pipeline.Service;
 
@@ -33,7 +34,7 @@ namespace Predix.Pipeline.Test
         {
             DateTime startDate = new DateTime(2015, 10, 28, 18, 58, 57, DateTimeKind.Utc);
             DateTime endDate = new DateTime(2017, 10, 28, 19, 12, 17, DateTimeKind.Utc);
-            var details = _eventService.Get(locationUid, eventType, startDate, endDate);
+            var details = _eventService.Get(locationUid, eventType, startDate.ToEpoch().ToString(), endDate.ToEpoch().ToString());
             Assert.IsNotNull(details);
             Assert.AreSame(new List<ParkingEvent>(), details);
         }

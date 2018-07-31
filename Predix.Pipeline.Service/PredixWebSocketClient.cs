@@ -84,8 +84,8 @@ namespace Predix.Pipeline.Service
                     }
 
                     if (string.IsNullOrWhiteSpace(response)) continue;
-                    Task.Run(async () =>
-                            await ProcessEvent(imageService, options, customer, response),
+                    Task.Run(() =>
+                            ProcessEvent(imageService, options, customer, response),
                         cancellationTokenSource.Token).ConfigureAwait(false);
                     //Task.Factory.StartNew(() => ProcessEvent(imageService, options, customerId, response), cancellationTokenSource.Token);
                 }
@@ -93,8 +93,124 @@ namespace Predix.Pipeline.Service
                 Commentary.Print($"WebSocket State:{clientWebSocket.State}");
             }
         }
+        public bool ProcessEvent(IImage imageService, Customer customer, ParkingEvent parkingEvent)
+        {
+            try
+            {
+                Commentary.Print($"Location ID :{parkingEvent.LocationUid}");
+                parkingEvent.CustomerId = customer.Id;
+                if (parkingEvent.Properties == null)
+                    parkingEvent.Properties = new ParkingEventProperties
+                    {
+                        CreatedDate = DateTime.UtcNow.ToTimeZone(customer.TimezoneId),
+                        ModifiedDate = DateTime.UtcNow.ToTimeZone(customer.TimezoneId)
+                    };
+                parkingEvent.Properties.LocationUid = parkingEvent.LocationUid;
 
-        private Task<bool> ProcessEvent(IImage imageService, Options options, Customer customer, string response)
+
+                var isVoilation = false;
+                using (var context = new PredixContext())
+                {
+                    var anyRecord = context.ParkingEvents.Any(x => x.LocationUid == parkingEvent.LocationUid
+                    && x.EventType == parkingEvent.EventType
+                    && x.Properties.ObjectUid == parkingEvent.Properties.ObjectUid
+                    && x.Properties.ImageAssetUid == parkingEvent.Properties.ImageAssetUid);
+                    if (anyRecord)
+                        return false;
+
+                    var nodeMasterRegulations =
+                        context.NodeMasterRegulations.Include(x => x.ParkingRegulation).ToList();
+
+                    var nodeMasterRegulation =
+                        nodeMasterRegulations.Where(x => x.LocationUid == parkingEvent.LocationUid)
+                            .ToList();
+                    if (nodeMasterRegulation.Any())
+                    {
+                        var latLongs = parkingEvent.Properties.GeoCoordinates.Split(',').ToList();
+                        var parkingRegulations = new List<ParkingRegulation>();
+                        foreach (var regulation in nodeMasterRegulation)
+                        {
+                            ViolationPercentage(latLongs, regulation, parkingEvent);
+                            if (parkingEvent.MatchRate > 0)
+                                parkingRegulations.Add(regulation.ParkingRegulation);
+                            Commentary.Print(
+                                $"Regulation Id: {regulation.Id}, Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Match Rate {parkingEvent.MatchRate}",
+                                true);
+                        }
+
+                        foreach (var regulation in parkingRegulations)
+                        {
+                            Commentary.Print(
+                                $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, DateTime.UtcNow.ToEst().DayOfWeek:{DateTime.UtcNow.ToTimeZone(customer.TimezoneId).DayOfWeek}, ViolationType: {regulation.ViolationType}",
+                                true);
+                            if (regulation.DayOfWeek.Split('|')
+                                .Contains(DateTime.UtcNow.ToTimeZone(customer.TimezoneId).DayOfWeek.ToString()
+                                    .Substring(0, 3)))
+                            {
+                                GeViolation geViolation = new GeViolation();
+
+                                switch (regulation.ViolationType)
+                                {
+                                    case ViolationType.NoParking:
+                                        Commentary.Print(
+                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Checking No Parking",
+                                            true);
+                                        isVoilation = NoParkingCheck(regulation, parkingEvent, geViolation, context,
+                                            customer);
+                                        break;
+                                    case ViolationType.StreetSweeping:
+                                        Commentary.Print(
+                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Checking Street Sweeping",
+                                            true);
+                                        isVoilation = IsStreetSweeping(regulation, parkingEvent, geViolation, context,
+                                            customer);
+                                        break;
+                                    case ViolationType.TimeLimitParking:
+                                        Commentary.Print(
+                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Checking Time Limit",
+                                            true);
+                                        isVoilation = IsTimeLimitExceed(regulation, parkingEvent, geViolation, context,
+                                            customer);
+                                        break;
+                                    case ViolationType.ReservedParking:
+                                        //This is out of scope for now, so we ae skipping this logic
+                                        break;
+                                    case ViolationType.FireHydrant:
+                                        Commentary.Print(
+                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Fire Hydrant",
+                                            true);
+                                        isVoilation = IsFireHydrant(parkingEvent, geViolation, regulation, context,
+                                            customer);
+                                        break;
+                                }
+
+                                Commentary.Print(
+                                    $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Is Violation: {isVoilation}",
+                                    true);
+                            }
+
+                            if (isVoilation)
+                                break;
+                        }
+                    }
+
+                    context.SaveChanges();
+                }
+
+                if (!isVoilation) return true;
+                Save(parkingEvent, customer);
+                imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid,
+                    parkingEvent.Timestamp, customer);
+                return false;
+            }
+            catch (Exception e)
+            {
+                Commentary.Print("******************************************");
+                Commentary.Print(e.ToString());
+                return false;
+            }
+        }
+        private bool ProcessEvent(IImage imageService, Options options, Customer customer, string response)
         {
             try
             {
@@ -121,7 +237,7 @@ namespace Predix.Pipeline.Service
                     imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid,
                         parkingEvent.Timestamp, customer);
 
-                    return Task.FromResult(true);
+                    return true;
 
                     #endregion
                 }
@@ -133,7 +249,7 @@ namespace Predix.Pipeline.Service
                     imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid,
                         parkingEvent.Timestamp, customer);
 
-                    return Task.FromResult(true);
+                    return true;
                 }
 
                 var isVoilation = false;
@@ -218,18 +334,18 @@ namespace Predix.Pipeline.Service
                     context.SaveChanges();
                 }
 
-                if (!isVoilation && !options.SaveEvents) return Task.FromResult(true);
+                if (!isVoilation && !options.SaveEvents) return true;
                 Save(parkingEvent, customer);
                 if (isVoilation || options.SaveImages)
                     imageService.MediaOnDemand(parkingEvent, parkingEvent.Properties.ImageAssetUid,
                         parkingEvent.Timestamp, customer);
-                return Task.FromResult(false);
+                return false;
             }
             catch (Exception e)
             {
                 Commentary.Print("******************************************");
                 Commentary.Print(e.ToString());
-                return Task.FromResult(false);
+                return false;
             }
         }
 

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -33,7 +34,8 @@ namespace Predix.Pipeline.Service
             var media = GetMedia(imageAssetUid, timestamp);
             Image image = new Image { PropertyId = parkingEvent.Properties.Id };
             var i = 1;
-            while (i < 5 && (image?.Entry == null || !image.Entry.Contents.Any(x => x.Status.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))))
+            TimeSpan startTime = DateTime.Now.TimeOfDay;
+            while (i < 6 && (image?.Entry == null || !image.Entry.Contents.Any(x => x.Status.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))))
             {
                 i++;
                 if (!string.IsNullOrWhiteSpace(media?.PollUrl))
@@ -61,8 +63,15 @@ namespace Predix.Pipeline.Service
                 if (image?.Entry == null ||
                     !image.Entry.Contents.Any(x => x.Status.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase)))
                 {
-                    Commentary.Print($"Polling for Media Data {i} time", true);
-                    System.Threading.Thread.Sleep(1000 * 60);
+                    Commentary.Print(
+                        $"Polling for Media Data {i} time after {DateTime.Now.TimeOfDay.Subtract(startTime).TotalMinutes} minutes: {media.PollUrl}",
+                        true);
+                    //Thread.Sleep(1000 * 60);
+                    if (i < 6)
+                    {
+                        Task.Delay(1000 * 60).Wait(1000 * 60);
+                    }
+
                     continue;
                 }
                 var imageBinary = (from content in image.Entry.Contents
@@ -76,6 +85,10 @@ namespace Predix.Pipeline.Service
             if (image == null) return;
             image.PropertyId = parkingEvent.Properties.Id;
             image.ImageAssetUid = imageAssetUid;
+
+            image.OriginalBase64 = null;
+            image.Base64 = null;
+
             Save(image);
             //return image.Base64;
         }

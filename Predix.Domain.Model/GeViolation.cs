@@ -67,7 +67,24 @@ namespace Predix.Domain.Model
         /// </summary>
         public bool IsViolated { get; set; }
 
+        //[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        //public bool ViolationTimeElapsed
+        //{
+        //    get;
+        //    //{
+        //        //if (ViolationType == ViolationType.StreetSweeping && EventOutDateTime.HasValue)
+        //        //{
+        //        //    return EventOutDateTime.Value.TimeOfDay > Regulation.EndTime;
+        //        //}
+
+        //        //return false;
+        //    //}
+        //    private set;
+        //}
+
         public int RegulationId { get; set; }
+        [ForeignKey("RegulationId")]
+        public virtual ParkingRegulation Regulation { get; set; }
         public ViolationType ViolationType { get; set; }
         public DateTime? EventInDateTime { get; set; }
         public DateTime? EventOutDateTime { get; set; }

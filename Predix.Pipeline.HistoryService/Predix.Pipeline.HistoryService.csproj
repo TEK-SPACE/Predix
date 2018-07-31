@@ -1,18 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CF02A527-58F1-4E93-A58D-FEEC0A10DBAE}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Predix.Pipeline.DataService</RootNamespace>
-    <AssemblyName>Predix.Pipeline.DataService</AssemblyName>
+    <ProjectGuid>{F0ECB3D5-612F-4D6E-B083-5EDE75553F68}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Predix.Pipeline.HistoryService</RootNamespace>
+    <AssemblyName>Predix.Pipeline.HistoryService</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -30,52 +32,55 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\201807272022344_RunSqlScript.cs" />
-    <Compile Include="Migrations\201807272022344_RunSqlScript.Designer.cs">
-      <DependentUpon>201807272022344_RunSqlScript.cs</DependentUpon>
+    <Compile Include="Service1.cs">
+      <SubType>Component</SubType>
     </Compile>
-    <Compile Include="PredixContext.cs" />
-    <Compile Include="PredixContextInitializer.cs" />
+    <Compile Include="Service1.Designer.cs">
+      <DependentUpon>Service1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Service1.resx">
+      <DependentUpon>Service1.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Predix.Domain.Model\Predix.Domain.Model.csproj">
       <Project>{7f72e9e0-463c-40c8-9b08-3596d91a432e}</Project>
       <Name>Predix.Domain.Model</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201807272022344_RunSqlScript.resx">
-      <DependentUpon>201807272022344_RunSqlScript.cs</DependentUpon>
-    </EmbeddedResource>
+    <ProjectReference Include="..\Predix.Pipeline.DataService\Predix.Pipeline.DataService.csproj">
+      <Project>{cf02a527-58f1-4e93-a58d-feec0a10dbae}</Project>
+      <Name>Predix.Pipeline.DataService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Predix.Pipeline.Helper\Predix.Pipeline.Helper.csproj">
+      <Project>{e4ea6006-fe75-4d07-a1d5-bf0cfcd46d3b}</Project>
+      <Name>Predix.Pipeline.Helper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Predix.Pipeline.Interface\Predix.Pipeline.Interface.csproj">
+      <Project>{f7631cdb-a84d-498c-87ce-30f414717ae5}</Project>
+      <Name>Predix.Pipeline.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Predix.Pipeline.Service\Predix.Pipeline.Service.csproj">
+      <Project>{83b637ac-d192-4fe4-8ce9-1a6b85d0c06c}</Project>
+      <Name>Predix.Pipeline.Service</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

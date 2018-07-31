@@ -73,6 +73,10 @@
       <Project>{7f72e9e0-463c-40c8-9b08-3596d91a432e}</Project>
       <Name>Predix.Domain.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Predix.Pipeline.Helper\Predix.Pipeline.Helper.csproj">
+      <Project>{E4EA6006-FE75-4D07-A1D5-BF0CFCD46D3B}</Project>
+      <Name>Predix.Pipeline.Helper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Predix.Pipeline.Interface\Predix.Pipeline.Interface.csproj">
       <Project>{f7631cdb-a84d-498c-87ce-30f414717ae5}</Project>
       <Name>Predix.Pipeline.Interface</Name>

@@ -28,5 +28,8 @@ namespace Predix.Domain.Model.Constant
             $"{MetaDataUrl}/v2/metadata/locations/{{locationUid}}";
 
         public static readonly string MediaOnDemand = $"{MediaUrl}/ondemand/assets/{{ps_asset}}/media?mediaType=IMAGE&timestamp={{timestamp}}&page=0&size=100&sortBy=mediaLogId&sortDir=DESC";
+
+        public static readonly string GetEventsByLocation =
+           $"{Eventurl}/v2/locations/{{locationUid}}/events?eventType={{eventType}}&startTime={{epochStartTime}}&endTime={{epochEndTime}}";
     }
 }

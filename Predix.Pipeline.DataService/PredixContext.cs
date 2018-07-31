@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
@@ -36,6 +37,13 @@ namespace Predix.Pipeline.DataService
         public DbSet<Measures> Measures { get; set; }
         public DbSet<Activity> Activities { get; set; }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            //modelBuilder.Entity<GeViolation>()
+            //    .Property(p => p.ViolationTimeElapsed)
+            //    .HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed)
+            //    .HasComputedColumnSql("[LastName] + ', ' + [FirstName]");
+        }
         public override int SaveChanges()
         {
             try

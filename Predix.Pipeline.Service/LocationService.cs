@@ -111,5 +111,13 @@ namespace Predix.Pipeline.Service
                 return context.Boundaries.Where(x => x.IsActive).ToList();
             }
         }
+
+        public List<string> GetLocationsUids()
+        {
+            using (PredixContext context = new PredixContext())
+            {
+                return context.Locations.Select(x => x.LocationUid).ToList();
+            }
+        }
     }
 }

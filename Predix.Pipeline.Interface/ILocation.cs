@@ -24,5 +24,7 @@ namespace Predix.Pipeline.Interface
         void SaveLocationKeys(List<Location> locationKeys);
         void SaveLocationDetails(List<LocationDetails> locationDetailsList);
         List<Boundary> GetBoundaries();
+
+        List<string> GetLocationsUids();
     }
 }

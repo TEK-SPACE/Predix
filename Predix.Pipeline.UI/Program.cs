@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using CommandLine;
@@ -39,6 +40,7 @@ namespace Predix.Pipeline.UI
             }
 
             Init();
+           // History();
             var locationType = "PARKING_ZONE";
             int pagesize = 50;
             List<Boundary> boundaries = _locationService.GetBoundaries();
@@ -62,6 +64,22 @@ namespace Predix.Pipeline.UI
             Commentary.Print($"Completed. Please enter a key to exit");
         }
 
+        static void History()
+        {
+            IPredixWebSocketClient _predixWebSocketClient = new PredixWebSocketClient();
+            foreach (var location in _locationService.GetLocationsUids())
+            {
+                var inEvents = _eventService.Get(location, "PKIN", DateTime.UtcNow.AddHours(-1).ToEpoch().ToString(), DateTime.UtcNow.ToEpoch().ToString());
+                var outEvents = _eventService.Get(location, "PKOUT", DateTime.UtcNow.AddHours(-1).ToEpoch().ToString(), DateTime.UtcNow.ToEpoch().ToString());
+                inEvents.AddRange(outEvents);
+                foreach(var evnt in inEvents)
+                {
+                    _predixWebSocketClient.ProcessEvent(_imageService,
+                        new Customer() { Id = 4120, TimezoneId = "Eastern Standard Time" },
+                        evnt);
+                }
+            }
+        }
         static void Init()
         {
             Commentary.WriteToFile = true;
