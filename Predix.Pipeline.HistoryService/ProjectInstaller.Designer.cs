@@ -1,4 +1,4 @@
-﻿namespace Predix.Pipeline.WinService
+﻿namespace Predix.Pipeline.HistoryService
 {
     partial class ProjectInstaller
     {
@@ -33,14 +33,12 @@
             // 
             // serviceProcessInstaller1
             // 
-            this.serviceProcessInstaller1.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
             this.serviceProcessInstaller1.Password = null;
             this.serviceProcessInstaller1.Username = null;
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.DelayedAutoStart = true;
-            this.serviceInstaller1.ServiceName = "PredixRealTimeService";
+            this.serviceInstaller1.ServiceName = "PredixHistoryService";
             // 
             // ProjectInstaller
             // 

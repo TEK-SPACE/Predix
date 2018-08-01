@@ -4,7 +4,9 @@ using Predix.Pipeline.Interface;
 using Predix.Pipeline.Service;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Predix.Pipeline.HistoryService
@@ -15,6 +17,7 @@ namespace Predix.Pipeline.HistoryService
         private static IEvent _eventService;
         private static IImage _imageService;
         private static readonly Dictionary<string, object> GlobalVariables = new Dictionary<string, object>();
+        private Timer _schedular;
         public PredixHistoryService()
         {
             InitializeComponent();
@@ -29,10 +32,32 @@ namespace Predix.Pipeline.HistoryService
             _eventService = new EventService(GlobalVariables);
             _imageService = new ImageService(GlobalVariables);
             //Database.SetInitializer(new MigrateDatabaseToLatestVersion<PredixContext, PredixContextInitializer>());
+            _schedular = new Timer(new TimerCallback(SchedularCallback));
+            //Get the Interval in Minutes from AppSettings.
+            int intervalMinutes = Convert.ToInt32(ConfigurationManager.AppSettings["IntervalMinutes"]);
+            var scheduledTime = DateTime.Now.AddMinutes(intervalMinutes);
+            if (DateTime.Now > scheduledTime)
+            {
+                //If Scheduled Time is passed set Schedule for the next Interval.
+                scheduledTime = scheduledTime.AddMinutes(intervalMinutes);
+            }
+            TimeSpan timeSpan = scheduledTime.Subtract(DateTime.Now);
+            string schedule =
+                $"{timeSpan.Days} day(s) {timeSpan.Hours} hour(s) {timeSpan.Minutes} minute(s) {timeSpan.Seconds} seconds(s)";
 
-            Task.Run(() => GetHistory());
+            Commentary.Print("Simple Service scheduled to run after: " + schedule + " {0}");
+            //Get the difference in Minutes between the Scheduled and Current Time.
+            int dueTime = Convert.ToInt32(timeSpan.TotalMilliseconds);
+
+            //Change the Timer's Due Time.
+            _schedular.Change(dueTime, Timeout.Infinite);
+            //Task.Run(() => GetHistory());
         }
-
+        private void SchedularCallback(object e)
+        {
+            Commentary.Print("Simple Service Log: {0}");
+            this.GetHistory();
+        }
         protected override void OnStop()
         {
             Commentary.Print("RTA Service is Stoped");
