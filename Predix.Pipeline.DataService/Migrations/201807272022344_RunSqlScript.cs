@@ -7,12 +7,12 @@ namespace Predix.Pipeline.DataService
     {
         public override void Up()
         {
-            Sql("ALTER TABLE dbo.GeViolations ADD ViolationTimeElapsed AS dbo.ViolationTimeElapsed(RegulationId, EventInDateTime)");
+            //Sql("ALTER TABLE dbo.GeViolations ADD ViolationTimeElapsed AS dbo.ViolationTimeElapsed(RegulationId, EventInDateTime)");
         }
         
         public override void Down()
         {
-            Sql("ALTER TABLE dbo.GeViolations DROP COLUMN ViolationTimeElapsed");
+            //Sql("ALTER TABLE dbo.GeViolations DROP COLUMN ViolationTimeElapsed");
         }
     }
 }
