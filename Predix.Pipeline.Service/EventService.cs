@@ -34,7 +34,7 @@ namespace Predix.Pipeline.Service
 
             var jsonRespone = JsonConvert.DeserializeObject<JObject>(response.Result);
             var parkingEvents = jsonRespone["content"].ToObject<List<ParkingEvent>>();
-            return parkingEvents;
+            return parkingEvents ?? new List<ParkingEvent>();
         }
         public void GetByBoundaryAsync(string bbox, string eventType1, string eventType2, IImage imageService, Options options, Customer customer)
         {

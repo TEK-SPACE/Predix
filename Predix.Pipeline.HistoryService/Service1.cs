@@ -25,9 +25,8 @@ namespace Predix.Pipeline.HistoryService
 
         protected override void OnStart(string[] args)
         {
-            Commentary.Print("Hitory Events Service is Started");
-
             Commentary.WriteToFile = true;
+            Commentary.Print("Hitory Events Service is Started");
             _locationService = new LocationService(GlobalVariables);
             _eventService = new EventService(GlobalVariables);
             _imageService = new ImageService(GlobalVariables);
@@ -64,21 +63,30 @@ namespace Predix.Pipeline.HistoryService
         }
         private void GetHistory()
         {
-            IPredixWebSocketClient _predixWebSocketClient = new PredixWebSocketClient();
-            foreach (var location in _locationService.GetLocationsUids())
+            try
             {
-                var inEvents = _eventService.Get(location, "PKIN", DateTime.UtcNow.AddHours(-1).ToEpoch().ToString(), DateTime.UtcNow.ToEpoch().ToString());
-                var outEvents = _eventService.Get(location, "PKOUT", DateTime.UtcNow.AddHours(-1).ToEpoch().ToString(), DateTime.UtcNow.ToEpoch().ToString());
-                inEvents.AddRange(outEvents);
-                foreach (var evnt in inEvents)
+                IPredixWebSocketClient predixWebSocketClient = new PredixWebSocketClient();
+                var locations = _locationService.GetLocationsUids();
+                Commentary.Print($"Total Locations: {locations.Count}");
+                foreach (var location in locations)
                 {
-                    _predixWebSocketClient.ProcessEvent(_imageService,
-                        new Customer() { Id = 4120, TimezoneId = "Eastern Standard Time" },
-                        evnt);
+                    var inEvents = _eventService.Get(location, "PKIN", DateTime.UtcNow.AddHours(-1).ToEpoch().ToString(), DateTime.UtcNow.ToEpoch().ToString());
+                    var outEvents = _eventService.Get(location, "PKOUT", DateTime.UtcNow.AddHours(-1).ToEpoch().ToString(), DateTime.UtcNow.ToEpoch().ToString());
+                    Commentary.Print($"location: {location}, In Events: {inEvents.Count}, Out Events: {outEvents.Count}");
+                    inEvents.AddRange(outEvents);
+                    foreach (var evnt in inEvents)
+                    {
+                        predixWebSocketClient.ProcessEvent(_imageService,
+                            new Customer() { Id = 4120, TimezoneId = "Eastern Standard Time" },
+                            evnt);
+                    }
                 }
             }
-
-            Commentary.Print($"Completed. Please enter a key to exit");
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Commentary.Print(e.ToString());
+            }
         }
     }
 }
