@@ -66,8 +66,7 @@ namespace Predix.Pipeline.Service
                                 .Result;
                         if (result.CloseStatus.HasValue)
                         {
-                            Console.WriteLine("Closed; Status: " + result.CloseStatus + ", " +
-                                              result.CloseStatusDescription);
+                            Commentary.Print($"Closed; Status: {result.CloseStatus}, {result.CloseStatusDescription}");
                         }
                         else
                         {
@@ -102,8 +101,8 @@ namespace Predix.Pipeline.Service
                 if (parkingEvent.Properties == null)
                     parkingEvent.Properties = new ParkingEventProperties
                     {
-                        CreatedDate = DateTime.UtcNow.ToTimeZone(customer.TimezoneId),
-                        ModifiedDate = DateTime.UtcNow.ToTimeZone(customer.TimezoneId)
+                        CreatedDate = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId),
+                        ModifiedDate = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId)
                     };
                 parkingEvent.Properties.LocationUid = parkingEvent.LocationUid;
 
@@ -141,10 +140,10 @@ namespace Predix.Pipeline.Service
                         foreach (var regulation in parkingRegulations)
                         {
                             Commentary.Print(
-                                $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, DateTime.UtcNow.ToEst().DayOfWeek:{DateTime.UtcNow.ToTimeZone(customer.TimezoneId).DayOfWeek}, ViolationType: {regulation.ViolationType}",
+                                $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid},parkingEvent.Timestamp.ToUtcDateTimeOrNull().DayOfWeek:{parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).DayOfWeek}, ViolationType: {regulation.ViolationType}",
                                 true);
                             if (regulation.DayOfWeek.Split('|')
-                                .Contains(DateTime.UtcNow.ToTimeZone(customer.TimezoneId).DayOfWeek.ToString()
+                                .Contains(parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).DayOfWeek.ToString()
                                     .Substring(0, 3)))
                             {
                                 GeViolation geViolation = new GeViolation();
@@ -218,15 +217,16 @@ namespace Predix.Pipeline.Service
                 ParkingEvent parkingEvent = jsonRespone != null
                     ? (jsonRespone).ToObject<ParkingEvent>()
                     : new ParkingEvent();
-                Commentary.Print($"Location ID :{parkingEvent.LocationUid}");
                 parkingEvent.CustomerId = customer.Id;
                 if (parkingEvent.Properties == null)
                     parkingEvent.Properties = new ParkingEventProperties
                     {
-                        CreatedDate = DateTime.UtcNow.ToTimeZone(customer.TimezoneId),
-                        ModifiedDate = DateTime.UtcNow.ToTimeZone(customer.TimezoneId)
+                        CreatedDate = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId),
+                        ModifiedDate = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId)
                     };
                 parkingEvent.Properties.LocationUid = parkingEvent.LocationUid;
+
+                Commentary.Print($"Location Id :{parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Object Id: {parkingEvent.Properties?.ObjectUid}");
 
                 if (options.MarkAllAsViolations)
                 {
@@ -278,10 +278,10 @@ namespace Predix.Pipeline.Service
                         foreach (var regulation in parkingRegulations)
                         {
                             Commentary.Print(
-                                $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, DateTime.UtcNow.ToEst().DayOfWeek:{DateTime.UtcNow.ToTimeZone(customer.TimezoneId).DayOfWeek}, ViolationType: {regulation.ViolationType}",
+                                $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToEst().DayOfWeek:{parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).DayOfWeek}, ViolationType: {regulation.ViolationType}",
                                 true);
                             if (regulation.DayOfWeek.Split('|')
-                                .Contains(DateTime.UtcNow.ToTimeZone(customer.TimezoneId).DayOfWeek.ToString()
+                                .Contains(parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).DayOfWeek.ToString()
                                     .Substring(0, 3)))
                             {
                                 GeViolation geViolation = new GeViolation();
@@ -290,21 +290,21 @@ namespace Predix.Pipeline.Service
                                 {
                                     case ViolationType.NoParking:
                                         Commentary.Print(
-                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Checking No Parking",
+                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Object Id: {parkingEvent.Properties.ObjectUid}, Checking No Parking",
                                             true);
                                         isVoilation = NoParkingCheck(regulation, parkingEvent, geViolation, context,
                                             customer);
                                         break;
                                     case ViolationType.StreetSweeping:
                                         Commentary.Print(
-                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Checking Street Sweeping",
+                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Object Id: {parkingEvent.Properties.ObjectUid}, Checking Street Sweeping",
                                             true);
                                         isVoilation = IsStreetSweeping(regulation, parkingEvent, geViolation, context,
                                             customer);
                                         break;
                                     case ViolationType.TimeLimitParking:
                                         Commentary.Print(
-                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Checking Time Limit",
+                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Object Id: {parkingEvent.Properties.ObjectUid}, Checking Time Limit",
                                             true);
                                         isVoilation = IsTimeLimitExceed(regulation, parkingEvent, geViolation, context,
                                             customer);
@@ -314,7 +314,7 @@ namespace Predix.Pipeline.Service
                                         break;
                                     case ViolationType.FireHydrant:
                                         Commentary.Print(
-                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Fire Hydrant",
+                                            $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Object Id: {parkingEvent.Properties.ObjectUid}, Fire Hydrant",
                                             true);
                                         isVoilation = IsFireHydrant(parkingEvent, geViolation, regulation, context,
                                             customer);
@@ -322,7 +322,7 @@ namespace Predix.Pipeline.Service
                                 }
 
                                 Commentary.Print(
-                                    $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Is Violation: {isVoilation}",
+                                    $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Object Id: {parkingEvent.Properties.ObjectUid}, Is Violation: {isVoilation}",
                                     true);
                             }
 
@@ -364,13 +364,13 @@ namespace Predix.Pipeline.Service
                     if (inEvent?.ParkinTime != null)
                     {
                         inEvent.ExceedParkingLimit = true;
-                        inEvent.ParkoutTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                        inEvent.ParkoutTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                         inEvent.EventOutDateTime =
                             parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                        inEvent.ViolationDuration = (long) DateTime.UtcNow.ToTimeZone(customer.TimezoneId)
+                        inEvent.ViolationDuration = (long)parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId)
                             .Subtract(inEvent.ParkinTime.Value).TotalMinutes;
                         inEvent.ExceedParkingLimit = true;
-                        inEvent.ModifiedDateTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                        inEvent.ModifiedDateTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                         inEvent.IsException = true;
                         inEvent.UserAction = "Missed_Violation";
                         innerContext.SaveChanges();
@@ -386,13 +386,13 @@ namespace Predix.Pipeline.Service
             if (parkingEvent.EventType.Equals("PKIN"))
             {
                 geViolation.EventInDateTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                geViolation.ParkinTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                geViolation.ParkinTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
             }
 
             if (parkingEvent.EventType.Equals("PKOUT"))
             {
                 geViolation.EventOutDateTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                geViolation.ParkoutTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                geViolation.ParkoutTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
             }
 
             geViolation.RegulationId = regulation.RegualationId;
@@ -406,14 +406,14 @@ namespace Predix.Pipeline.Service
             GeViolation geViolation, PredixContext context, Customer customer)
         {
             bool isVoilation = false;
-            if (DateTime.UtcNow.ToTimeZone(customer.TimezoneId).TimeOfDay >= regulation.StartTime &&
-                DateTime.UtcNow.ToTimeZone(customer.TimezoneId).TimeOfDay <= regulation.EndTime &&
+            if (parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).TimeOfDay >= regulation.StartTime &&
+                parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).TimeOfDay <= regulation.EndTime &&
                parkingEvent.EventType.Equals("PKIN"))
             {
                 Commentary.Print("*** Timelimit In Event");
                 isVoilation = true;
 
-                geViolation.ParkinTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                geViolation.ParkinTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                 geViolation.EventInDateTime =
                     parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                 geViolation.ObjectUid = parkingEvent.Properties.ObjectUid;
@@ -424,11 +424,9 @@ namespace Predix.Pipeline.Service
 
                 context.GeViolations.Add(geViolation);
             }
-            else if (DateTime.UtcNow.ToTimeZone(customer.TimezoneId).TimeOfDay >= regulation.StartTime &&
-                     DateTime.UtcNow.ToTimeZone(customer.TimezoneId).TimeOfDay <= regulation.EndTime &&
-                     parkingEvent.EventType.Equals("PKOUT")
+            else if (parkingEvent.EventType.Equals("PKOUT")
             && regulation.Duration >= parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId)
-                    .Subtract(DateTime.UtcNow.ToTimeZone(customer.TimezoneId)).TotalMinutes)
+                    .Subtract(parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId)).TotalMinutes)
             {
                 isVoilation = true;
                 Commentary.Print("*** Exceeded Time Limit Violation");
@@ -440,13 +438,13 @@ namespace Predix.Pipeline.Service
                     if (inEvent?.ParkinTime != null)
                     {
                         inEvent.ExceedParkingLimit = true;
-                        inEvent.ParkoutTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                        inEvent.ParkoutTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                         inEvent.EventOutDateTime =
                             parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                        inEvent.ViolationDuration = (long) DateTime.UtcNow.ToTimeZone(customer.TimezoneId)
+                        inEvent.ViolationDuration = (long)parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId)
                             .Subtract(inEvent.ParkinTime.Value).TotalMinutes;
                         inEvent.ExceedParkingLimit = true;
-                        inEvent.ModifiedDateTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                        inEvent.ModifiedDateTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                         inEvent.IsException = true;
                         inEvent.UserAction = "Missed_Violation";
                         innerContext.SaveChanges();
@@ -461,35 +459,35 @@ namespace Predix.Pipeline.Service
             GeViolation geViolation, PredixContext context, Customer customer)
         {
             bool isVoilation = false;
-            if (DateTime.UtcNow.ToTimeZone(customer.TimezoneId).TimeOfDay >= regulation.StartTime &&
-                DateTime.UtcNow.ToTimeZone(customer.TimezoneId).TimeOfDay <= regulation.EndTime)
+            if (parkingEvent.EventType.Equals("PKOUT"))
+            {
+                using (var innerContext = new PredixContext())
+                {
+                    var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
+                        x.ObjectUid == parkingEvent.Properties.ObjectUid &&
+                        x.LocationUid == parkingEvent.LocationUid);
+                    if (inEvent?.ParkinTime != null)
+                    {
+                        inEvent.ExceedParkingLimit = true;
+                        inEvent.ParkoutTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
+                        inEvent.EventOutDateTime =
+                            parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
+                        inEvent.ViolationDuration = (long)parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId)
+                            .Subtract(inEvent.ParkinTime.Value).TotalMinutes;
+                        inEvent.ExceedParkingLimit = true;
+                        inEvent.ModifiedDateTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
+                        inEvent.IsException = true;
+                        inEvent.UserAction = "Missed_Violation";
+                        innerContext.SaveChanges();
+                    }
+                }
+
+                return false;
+            }
+            if (parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).TimeOfDay >= regulation.StartTime &&
+                parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).TimeOfDay <= regulation.EndTime)
             {
                 Commentary.Print("*** StreetWeeping Violation");
-                if (parkingEvent.EventType.Equals("PKOUT"))
-                {
-                    using (var innerContext = new PredixContext())
-                    {
-                        var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
-                            x.ObjectUid == parkingEvent.Properties.ObjectUid &&
-                            x.LocationUid == parkingEvent.LocationUid);
-                        if (inEvent?.ParkinTime != null)
-                        {
-                            inEvent.ExceedParkingLimit = true;
-                            inEvent.ParkoutTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
-                            inEvent.EventOutDateTime =
-                                parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                            inEvent.ViolationDuration = (long) DateTime.UtcNow.ToTimeZone(customer.TimezoneId)
-                                .Subtract(inEvent.ParkinTime.Value).TotalMinutes;
-                            inEvent.ExceedParkingLimit = true;
-                            inEvent.ModifiedDateTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
-                            inEvent.IsException = true;
-                            inEvent.UserAction = "Missed_Violation";
-                            innerContext.SaveChanges();
-                        }
-                    }
-
-                    return false;
-                }
 
                 isVoilation = true;
                 geViolation.StreetSweeping = true;
@@ -499,14 +497,14 @@ namespace Predix.Pipeline.Service
                 {
                     geViolation.EventInDateTime =
                         parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                    geViolation.ParkinTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                    geViolation.ParkinTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                 }
 
                 if (parkingEvent.EventType.Equals("PKOUT"))
                 {
                     geViolation.EventOutDateTime =
                         parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                    geViolation.ParkoutTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                    geViolation.ParkoutTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                 }
 
                 geViolation.RegulationId = regulation.RegualationId;
@@ -523,38 +521,37 @@ namespace Predix.Pipeline.Service
         {
             bool isVoilation = false;
             Commentary.Print(
-                $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, DateTime.UtcNow.ToEst().TimeOfDay: {DateTime.UtcNow.ToTimeZone(customer.TimezoneId).TimeOfDay:g}, regulation.StartTime : {regulation.StartTime}, regulation.EndTime:{regulation.EndTime}",
+                $"Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToEst().TimeOfDay: {parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).TimeOfDay:g}, regulation.StartTime : {regulation.StartTime}, regulation.EndTime:{regulation.EndTime}",
                 true);
-            if (DateTime.UtcNow.ToTimeZone(customer.TimezoneId).TimeOfDay >= regulation.StartTime &&
-                DateTime.UtcNow.ToTimeZone(customer.TimezoneId).TimeOfDay <= regulation.EndTime)
+            if (parkingEvent.EventType.Equals("PKOUT"))
             {
-                Commentary.Print("No Parkign Violation");
-                if (parkingEvent.EventType.Equals("PKOUT"))
+                using (var innerContext = new PredixContext())
                 {
-                    using (var innerContext = new PredixContext())
+                    var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
+                        x.ObjectUid == parkingEvent.Properties.ObjectUid &&
+                        x.LocationUid == parkingEvent.LocationUid);
+                    if (inEvent?.ParkinTime != null)
                     {
-                        var inEvent = innerContext.GeViolations.FirstOrDefault(x =>
-                            x.ObjectUid == parkingEvent.Properties.ObjectUid &&
-                            x.LocationUid == parkingEvent.LocationUid);
-                        if (inEvent?.ParkinTime != null)
-                        {
-                            inEvent.ExceedParkingLimit = true;
-                            inEvent.ParkoutTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
-                            inEvent.ViolationDuration = (long) DateTime.UtcNow.ToTimeZone(customer.TimezoneId)
-                                .Subtract(inEvent.ParkinTime.Value).TotalMinutes;
-                            inEvent.ExceedParkingLimit = true;
-                            inEvent.EventOutDateTime =
-                                parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                            inEvent.ModifiedDateTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
-                            inEvent.IsException = true;
-                            inEvent.UserAction = "Missed_Violation";
-                            innerContext.SaveChanges();
-                        }
+                        inEvent.ExceedParkingLimit = true;
+                        inEvent.ParkoutTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
+                        inEvent.ViolationDuration = (long)parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId)
+                            .Subtract(inEvent.ParkinTime.Value).TotalMinutes;
+                        inEvent.ExceedParkingLimit = true;
+                        inEvent.EventOutDateTime =
+                            parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
+                        inEvent.ModifiedDateTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
+                        inEvent.IsException = true;
+                        inEvent.UserAction = "Missed_Violation";
+                        innerContext.SaveChanges();
                     }
-
-                    return false;
                 }
 
+                return false;
+            }
+            if (parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).TimeOfDay >= regulation.StartTime &&
+                parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId).TimeOfDay <= regulation.EndTime)
+            {
+                Commentary.Print("No Parkign Violation");
                 isVoilation = true;
                 geViolation.NoParking = true;
                 geViolation.ObjectUid = parkingEvent.Properties.ObjectUid;
@@ -563,14 +560,14 @@ namespace Predix.Pipeline.Service
                 {
                     geViolation.EventInDateTime =
                         parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                    geViolation.ParkinTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                    geViolation.ParkinTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                 }
 
                 if (parkingEvent.EventType.Equals("PKOUT"))
                 {
                     geViolation.EventOutDateTime =
                         parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                    geViolation.ParkoutTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                    geViolation.ParkoutTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                 }
 
                 geViolation.RegulationId = regulation.RegualationId;
@@ -622,13 +619,13 @@ namespace Predix.Pipeline.Service
                     if (inEvent?.ParkinTime != null)
                     {
                         inEvent.ExceedParkingLimit = true;
-                        inEvent.ParkoutTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                        inEvent.ParkoutTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                         inEvent.EventOutDateTime =
                             parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                        inEvent.ViolationDuration = (long) DateTime.UtcNow.ToTimeZone(customer.TimezoneId)
+                        inEvent.ViolationDuration = (long)parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId)
                             .Subtract(inEvent.ParkinTime.Value).TotalMinutes;
                         inEvent.ExceedParkingLimit = true;
-                        inEvent.ModifiedDateTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                        inEvent.ModifiedDateTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                         inEvent.IsException = true;
                         inEvent.UserAction = "Missed_Violation";
                         innerContext.SaveChanges();
@@ -647,13 +644,13 @@ namespace Predix.Pipeline.Service
             if (parkingEvent.EventType.Equals("PKIN"))
             {
                 geViolation.EventInDateTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                geViolation.ParkinTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                geViolation.ParkinTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
             }
 
             if (parkingEvent.EventType.Equals("PKOUT"))
             {
                 geViolation.EventOutDateTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
-                geViolation.ParkoutTime = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                geViolation.ParkoutTime = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
             }
 
             geViolation.RegulationId = 81;
@@ -682,7 +679,7 @@ namespace Predix.Pipeline.Service
             using (PredixContext context = new PredixContext())
             {
                 Commentary.Print("Saving Event Data", true);
-                parkingEvent.CreatedDate = DateTime.UtcNow.ToTimeZone(customer.TimezoneId);
+                parkingEvent.CreatedDate = parkingEvent.Timestamp.ToUtcDateTimeOrNull().ToTimeZone(customer.TimezoneId);
                 context.ParkingEvents.Add(parkingEvent);
                 //context.ParkingEvents.AddOrUpdate(x => new { x.LocationUid, x.EventType }, parkingEvent);
                 context.SaveChanges();

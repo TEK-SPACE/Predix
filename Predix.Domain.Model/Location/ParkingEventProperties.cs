@@ -25,6 +25,7 @@ namespace Predix.Domain.Model.Location
         ///// </summary>
         //[JsonProperty(PropertyName = "eventUid")]
         //public string EventUid { get; set; }
+
         /// <summary>
         /// The unique identifier of a specific vehicle.
         /// </summary>

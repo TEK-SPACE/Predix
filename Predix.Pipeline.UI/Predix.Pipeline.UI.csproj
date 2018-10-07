@@ -48,18 +48,18 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <ManifestCertificateThumbprint>BAFDE77F5E491E7BB9A5F1FCA0A0C80570EA86AE</ManifestCertificateThumbprint>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>Predix.Pipeline.UI_TemporaryKey.pfx</ManifestKeyFile>
-  </PropertyGroup>
+  <!-- <PropertyGroup> -->
+    <!-- <ManifestCertificateThumbprint>BAFDE77F5E491E7BB9A5F1FCA0A0C80570EA86AE</ManifestCertificateThumbprint> -->
+  <!-- </PropertyGroup> -->
+  <!-- <PropertyGroup> -->
+    <!-- <ManifestKeyFile>Predix.Pipeline.UI_TemporaryKey.pfx</ManifestKeyFile> -->
+  <!-- </PropertyGroup> 
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
-  </PropertyGroup>
+  </PropertyGroup>-->
   <ItemGroup>
     <Reference Include="CommandLine, Version=2.2.1.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineParser.2.2.1\lib\net45\CommandLine.dll</HintPath>
