@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.ServiceProcess;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Predix.Pipeline.HistoryService
 {
@@ -31,7 +30,7 @@ namespace Predix.Pipeline.HistoryService
             _eventService = new EventService(GlobalVariables);
             _imageService = new ImageService(GlobalVariables);
             //Database.SetInitializer(new MigrateDatabaseToLatestVersion<PredixContext, PredixContextInitializer>());
-            _schedular = new Timer(new TimerCallback(SchedularCallback));
+            _schedular = new Timer(SchedularCallback);
             //Get the Interval in Minutes from AppSettings.
             int intervalMinutes = Convert.ToInt32(ConfigurationManager.AppSettings["IntervalMinutes"]);
             var scheduledTime = DateTime.Now.AddMinutes(intervalMinutes);
@@ -70,8 +69,8 @@ namespace Predix.Pipeline.HistoryService
                 Commentary.Print($"Total Locations: {locations.Count}");
                 foreach (var location in locations)
                 {
-                    var inEvents = _eventService.Get(location, "PKIN", DateTime.UtcNow.AddHours(-1).ToEpoch().ToString(), DateTime.UtcNow.ToEpoch().ToString());
-                    var outEvents = _eventService.Get(location, "PKOUT", DateTime.UtcNow.AddHours(-1).ToEpoch().ToString(), DateTime.UtcNow.ToEpoch().ToString());
+                    var inEvents = _eventService.Get(location, "PKIN", DateTime.UtcNow.AddMinutes(-2).ToEpoch().ToString(), DateTime.UtcNow.AddSeconds(30).ToEpoch().ToString());
+                    var outEvents = _eventService.Get(location, "PKOUT", DateTime.UtcNow.AddMinutes(-2).ToEpoch().ToString(), DateTime.UtcNow.AddSeconds(30).ToEpoch().ToString());
                     Commentary.Print($"location: {location}, In Events: {inEvents.Count}, Out Events: {outEvents.Count}");
                     inEvents.AddRange(outEvents);
                     foreach (var evnt in inEvents)
