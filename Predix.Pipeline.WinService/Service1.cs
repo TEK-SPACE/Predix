@@ -33,7 +33,10 @@ namespace Predix.Pipeline.WinService
             _locationService = new LocationService(GlobalVariables);
             _eventService = new EventService(GlobalVariables);
             _imageService = new ImageService(GlobalVariables);
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<PredixContext, PredixContextInitializer>());
+            if (Convert.ToBoolean(ConfigurationManager.AppSettings["SeedData"]))
+            {
+                Database.SetInitializer(new MigrateDatabaseToLatestVersion<PredixContext, PredixContextInitializer>());
+            }
 
             Task.Run(() => OpenSocket());
         }

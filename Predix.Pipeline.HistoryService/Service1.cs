@@ -5,8 +5,10 @@ using Predix.Pipeline.Service;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity;
 using System.ServiceProcess;
 using System.Threading;
+using Predix.Pipeline.DataService;
 
 namespace Predix.Pipeline.HistoryService
 {
@@ -29,7 +31,10 @@ namespace Predix.Pipeline.HistoryService
             _locationService = new LocationService(GlobalVariables);
             _eventService = new EventService(GlobalVariables);
             _imageService = new ImageService(GlobalVariables);
-            //Database.SetInitializer(new MigrateDatabaseToLatestVersion<PredixContext, PredixContextInitializer>());
+            if (Convert.ToBoolean(ConfigurationManager.AppSettings["SeedData"]))
+            {
+                Database.SetInitializer(new MigrateDatabaseToLatestVersion<PredixContext, PredixContextInitializer>());
+            }
             _schedular = new Timer(SchedularCallback);
             //Get the Interval in Minutes from AppSettings.
             int intervalMinutes = Convert.ToInt32(ConfigurationManager.AppSettings["IntervalMinutes"]);

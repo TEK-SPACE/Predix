@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Drawing;
 using System.Linq;
 using System.Net;
@@ -118,23 +117,27 @@ namespace Predix.Pipeline.Service
                         return false;
 
                     var nodeMasterRegulations =
-                        context.NodeMasterRegulations.Include(x => x.ParkingRegulation)
-                            .Where(x => x.ParkingRegulation.IsActive).ToList();
+                        context.NodeMasterRegulations.Join(context.ParkingRegulations,
+                                node => node.RegulationId,
+                                regulation => regulation.RegualationId,
+                                (node, regulation) => new {Node = node, Regulation = regulation})
+                            .Where(x => x.Regulation.IsActive && x.Node.LocationUid == parkingEvent.LocationUid)
+                            .Select(x=>x.Regulation).ToList();
 
-                    var nodeMasterRegulation =
-                        nodeMasterRegulations.Where(x => x.LocationUid == parkingEvent.LocationUid)
-                            .ToList();
-                    if (nodeMasterRegulation.Any())
+                    //var nodeMasterRegulation =
+                    //    nodeMasterRegulations.Where(x => x.LocationUid == parkingEvent.LocationUid)
+                    //        .ToList();
+                    if (nodeMasterRegulations.Any())
                     {
                         var latLongs = parkingEvent.Properties.GeoCoordinates.Split(',').ToList();
                         var parkingRegulations = new List<ParkingRegulation>();
-                        foreach (var regulation in nodeMasterRegulation)
+                        foreach (var regulation in nodeMasterRegulations)
                         {
                             ViolationPercentage(latLongs, regulation, parkingEvent);
                             if (parkingEvent.MatchRate > 0)
-                                parkingRegulations.Add(regulation.ParkingRegulation);
+                                parkingRegulations.Add(regulation);
                             Commentary.Print(
-                                $"Regulation Id: {regulation.Id}, Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Match Rate {parkingEvent.MatchRate}",
+                                $"Regulation Id: {regulation.RegualationId}, Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Match Rate {parkingEvent.MatchRate}",
                                 true);
                         }
 
@@ -256,24 +259,31 @@ namespace Predix.Pipeline.Service
                 var isVoilation = false;
                 using (var context = new PredixContext())
                 {
-                    var nodeMasterRegulations =
-                        context.NodeMasterRegulations.Include(x => x.ParkingRegulation)
-                            .Where(x => x.ParkingRegulation.IsActive).ToList();
+                    //var nodeMasterRegulations =
+                    //    context.NodeMasterRegulations.Include(x => x.ParkingRegulation)
+                    //        .Where(x => x.ParkingRegulation.IsActive).ToList();
 
-                    var nodeMasterRegulation =
-                        nodeMasterRegulations.Where(x => x.LocationUid == parkingEvent.LocationUid)
-                            .ToList();
-                    if (nodeMasterRegulation.Any())
+                    //var nodeMasterRegulation =
+                    //    nodeMasterRegulations.Where(x => x.LocationUid == parkingEvent.LocationUid)
+                    //        .ToList();
+                    var nodeMasterRegulations =
+                        context.NodeMasterRegulations.Join(context.ParkingRegulations,
+                                node => node.RegulationId,
+                                regulation => regulation.RegualationId,
+                                (node, regulation) => new { Node = node, Regulation = regulation })
+                            .Where(x => x.Regulation.IsActive && x.Node.LocationUid == parkingEvent.LocationUid)
+                            .Select(x => x.Regulation).ToList();
+                    if (nodeMasterRegulations.Any())
                     {
                         var latLongs = parkingEvent.Properties.GeoCoordinates.Split(',').ToList();
                         var parkingRegulations = new List<ParkingRegulation>();
-                        foreach (var regulation in nodeMasterRegulation)
+                        foreach (var regulation in nodeMasterRegulations)
                         {
                             ViolationPercentage(latLongs, regulation, parkingEvent);
                             if (parkingEvent.MatchRate > 0)
-                                parkingRegulations.Add(regulation.ParkingRegulation);
+                                parkingRegulations.Add(regulation);
                             Commentary.Print(
-                                $"Regulation Id: {regulation.Id}, Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Match Rate {parkingEvent.MatchRate}",
+                                $"Regulation Id: {regulation.RegualationId}, Location Uid: {parkingEvent.LocationUid}, Asset Uid: {parkingEvent.AssetUid}, Match Rate {parkingEvent.MatchRate}",
                                 true);
                         }
 
@@ -580,7 +590,7 @@ namespace Predix.Pipeline.Service
             return isVoilation;
         }
 
-        private static void ViolationPercentage(List<string> latLongs, NodeMasterRegulation regulation,
+        private static void ViolationPercentage(List<string> latLongs, ParkingRegulation regulation,
             ParkingEvent parkingEvent)
         {
             foreach (var latLong in latLongs)
@@ -588,17 +598,17 @@ namespace Predix.Pipeline.Service
                 if (IsPointInPolygon4(new List<PointF>
                     {
                         new PointF(
-                            float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[0]),
-                            float.Parse(regulation.ParkingRegulation.Coodrinate1.Split(':')[1])),
+                            float.Parse(regulation.Coodrinate1.Split(':')[0]),
+                            float.Parse(regulation.Coodrinate1.Split(':')[1])),
                         new PointF(
-                            float.Parse(regulation.ParkingRegulation.Coodrinate2.Split(':')[0]),
-                            float.Parse(regulation.ParkingRegulation.Coodrinate2.Split(':')[1])),
+                            float.Parse(regulation.Coodrinate2.Split(':')[0]),
+                            float.Parse(regulation.Coodrinate2.Split(':')[1])),
                         new PointF(
-                            float.Parse(regulation.ParkingRegulation.Coodrinate3.Split(':')[0]),
-                            float.Parse(regulation.ParkingRegulation.Coodrinate3.Split(':')[1])),
+                            float.Parse(regulation.Coodrinate3.Split(':')[0]),
+                            float.Parse(regulation.Coodrinate3.Split(':')[1])),
                         new PointF(
-                            float.Parse(regulation.ParkingRegulation.Coodrinate4.Split(':')[0]),
-                            float.Parse(regulation.ParkingRegulation.Coodrinate4.Split(':')[1]))
+                            float.Parse(regulation.Coodrinate4.Split(':')[0]),
+                            float.Parse(regulation.Coodrinate4.Split(':')[1]))
                     }.ToArray(),
                     new PointF(float.Parse(latLong.Split(':')[0]),
                         float.Parse(latLong.Split(':')[1]))))
