@@ -9,6 +9,6 @@ namespace Predix.Pipeline.Interface
     {
         void OpenAsync(string url, string bodyMessage, Dictionary<string, string> additionalHeaders,
             IImage imageService, Options options, Customer customer);
-        bool ProcessEvent(IImage imageService, Customer customer, ParkingEvent parkingEvent);
+        bool ProcessEvent(IImage imageService, Options options, Customer customer, ParkingEvent parkingEvent);
     }
 }

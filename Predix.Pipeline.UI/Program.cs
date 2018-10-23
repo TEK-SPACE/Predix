@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using CommandLine;
@@ -67,6 +68,15 @@ namespace Predix.Pipeline.UI
         static void History()
         {
             IPredixWebSocketClient _predixWebSocketClient = new PredixWebSocketClient();
+            Options options = new Options
+            {
+                IgnoreRegulationCheck = Convert.ToBoolean(ConfigurationManager.AppSettings["IgnoreRegulationCheck"]),
+                MarkAllAsViolations = Convert.ToBoolean(ConfigurationManager.AppSettings["MarkAllAsViolations"]),
+                RefreshLocations = Convert.ToBoolean(ConfigurationManager.AppSettings["RefreshLocations"]),
+                SaveEvents = Convert.ToBoolean(ConfigurationManager.AppSettings["SaveEvents"]),
+                SaveImages = Convert.ToBoolean(ConfigurationManager.AppSettings["SaveImages"]),
+                Debug = Convert.ToBoolean(ConfigurationManager.AppSettings["Debug"])
+            };
             foreach (var location in _locationService.GetLocationsUids())
             {
                 var inEvents = _eventService.Get(location, "PKIN", DateTime.UtcNow.AddHours(-1).ToEpoch().ToString(), DateTime.UtcNow.ToEpoch().ToString());
@@ -74,7 +84,7 @@ namespace Predix.Pipeline.UI
                 inEvents.AddRange(outEvents);
                 foreach(var evnt in inEvents)
                 {
-                    _predixWebSocketClient.ProcessEvent(_imageService,
+                    _predixWebSocketClient.ProcessEvent(_imageService, options, 
                         new Customer() { Id = 4120, TimezoneId = "Eastern Standard Time" },
                         evnt);
                 }

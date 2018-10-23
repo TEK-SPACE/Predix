@@ -24,6 +24,10 @@ namespace Predix.Domain.Model
             HelpText = "Mark All as Violations")]
         public bool MarkAllAsViolations { get; set; }
 
+        [Option('d', "dg", //Required = true,
+            HelpText = "Enable Debugging")]
+        public bool Debug { get; set; }
+
         //[Option('v', "verbose", DefaultValue = true,
         //     HelpText = "Prints all messages to standard output.")]
         //public bool Verbose { get; set; }

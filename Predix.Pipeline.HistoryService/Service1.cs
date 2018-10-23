@@ -72,6 +72,16 @@ namespace Predix.Pipeline.HistoryService
                 IPredixWebSocketClient predixWebSocketClient = new PredixWebSocketClient();
                 var locations = _locationService.GetLocationsUids();
                 Commentary.Print($"Total Locations: {locations.Count}");
+                Options options = new Options
+                {
+                    IgnoreRegulationCheck = Convert.ToBoolean(ConfigurationManager.AppSettings["IgnoreRegulationCheck"]),
+                    MarkAllAsViolations = Convert.ToBoolean(ConfigurationManager.AppSettings["MarkAllAsViolations"]),
+                    RefreshLocations = Convert.ToBoolean(ConfigurationManager.AppSettings["RefreshLocations"]),
+                    SaveEvents = Convert.ToBoolean(ConfigurationManager.AppSettings["SaveEvents"]),
+                    SaveImages = Convert.ToBoolean(ConfigurationManager.AppSettings["SaveImages"]),
+                    Debug = Convert.ToBoolean(ConfigurationManager.AppSettings["Debug"])
+                };
+
                 foreach (var location in locations)
                 {
                     var inEvents = _eventService.Get(location, "PKIN", DateTime.UtcNow.AddMinutes(-2).ToEpoch().ToString(), DateTime.UtcNow.AddSeconds(30).ToEpoch().ToString());
@@ -80,7 +90,7 @@ namespace Predix.Pipeline.HistoryService
                     inEvents.AddRange(outEvents);
                     foreach (var evnt in inEvents)
                     {
-                        predixWebSocketClient.ProcessEvent(_imageService,
+                        predixWebSocketClient.ProcessEvent(_imageService, options,
                             new Customer() { Id = 4120, TimezoneId = "Eastern Standard Time" },
                             evnt);
                     }

@@ -40,10 +40,14 @@ namespace Predix.Pipeline.Service
                     using (HttpContent httpContent = httpResponseMessage.Content)
                     {
                         var result = await httpContent.ReadAsStringAsync();
-                        if(_globalVariables.ContainsKey("ActivityId"))
-                            _globalVariables["ActivityId"] = logging.ActivityId;
-                        else
-                        _globalVariables.Add("ActivityId", logging.ActivityId);
+                        if (logging.ActivityId > 0)
+                        {
+                            if (_globalVariables.ContainsKey("ActivityId"))
+                                _globalVariables["ActivityId"] = logging.ActivityId;
+                            else
+                                _globalVariables.Add("ActivityId", logging.ActivityId);
+                        }
+
                         return result;
                     }
                 }

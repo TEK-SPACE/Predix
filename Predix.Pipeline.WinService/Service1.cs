@@ -56,7 +56,8 @@ namespace Predix.Pipeline.WinService
                 MarkAllAsViolations = Convert.ToBoolean(ConfigurationManager.AppSettings["MarkAllAsViolations"]),
                 RefreshLocations = Convert.ToBoolean(ConfigurationManager.AppSettings["RefreshLocations"]),
                 SaveEvents = Convert.ToBoolean(ConfigurationManager.AppSettings["SaveEvents"]),
-                SaveImages = Convert.ToBoolean(ConfigurationManager.AppSettings["SaveImages"])
+                SaveImages = Convert.ToBoolean(ConfigurationManager.AppSettings["SaveImages"]),
+                Debug = Convert.ToBoolean(ConfigurationManager.AppSettings["Debug"])
             };
             Commentary.Print(
                 $"\nRefresh Location = {options.RefreshLocations}");

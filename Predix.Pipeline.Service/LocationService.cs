@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using Newtonsoft.Json;
@@ -80,7 +81,11 @@ namespace Predix.Pipeline.Service
                 return;
             using (PredixContext context = new PredixContext())
             {
-                locationKeys.ForEach(x => x.ActivityId = Convert.ToInt32(_globalVariables["ActivityId"]));
+                if (Convert.ToBoolean(ConfigurationManager.AppSettings["Debug"]))
+                {
+                    locationKeys.ForEach(x => x.ActivityId = Convert.ToInt32(_globalVariables["ActivityId"]));
+                }
+
                 foreach (var locationKey in locationKeys)
                 {
                     context.Locations.AddOrUpdate(x => x.LocationUid, locationKey);
@@ -95,7 +100,10 @@ namespace Predix.Pipeline.Service
                 return;
             using (PredixContext context = new PredixContext())
             {
-                //locationKeys.ForEach(x => x.ActivityId = Convert.ToInt32(_globalVariables["ActivityId"]));
+                //if (Convert.ToBoolean(ConfigurationManager.AppSettings["Debug"]))
+                //{
+                //    locationKeys.ForEach(x => x.ActivityId = Convert.ToInt32(_globalVariables["ActivityId"]));
+                //}
                 foreach (var locationDetails in locationDetailsList)
                 {
                     context.LocationDetails.AddOrUpdate(x => x.LocationUid, locationDetails);

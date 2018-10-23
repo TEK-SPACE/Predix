@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,20 +39,23 @@ namespace Predix.Pipeline.Helper
 
             try
             {
-                using (PredixContext context = new PredixContext())
+                if (Convert.ToBoolean(ConfigurationManager.AppSettings["Debug"]))
                 {
-                    var activity = new Activity
+                    using (PredixContext context = new PredixContext())
                     {
-                        ProcessDateTime = DateTime.Now,
-                        RequestJson = request.Content?.ReadAsStringAsync().Result,
-                        ResponseJson = response.Content?.ReadAsStringAsync().Result,
-                        Type = request.Method.Method.Equals("get", StringComparison.OrdinalIgnoreCase)
-                            ? ActivityType.Get
-                            : ActivityType.Post
-                    };
-                    context.Activities.Add(activity);
-                    await context.SaveChangesAsync(cancellationToken);
-                    ActivityId = activity.Id;
+                        var activity = new Activity
+                        {
+                            ProcessDateTime = DateTime.Now,
+                            RequestJson = request.Content?.ReadAsStringAsync().Result,
+                            ResponseJson = response.Content?.ReadAsStringAsync().Result,
+                            Type = request.Method.Method.Equals("get", StringComparison.OrdinalIgnoreCase)
+                                ? ActivityType.Get
+                                : ActivityType.Post
+                        };
+                        context.Activities.Add(activity);
+                        await context.SaveChangesAsync(cancellationToken);
+                        ActivityId = activity.Id;
+                    }
                 }
             }
             catch (Exception e)
